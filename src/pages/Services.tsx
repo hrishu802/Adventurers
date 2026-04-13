@@ -1,28 +1,22 @@
 import { Container, Typography, Box, Grid, Card, CardContent, CardMedia } from '@mui/material';
 import { motion } from 'framer-motion';
 
-const Blog = () => {
-  const blogPosts = [
+const Services: React.FC = () => {
+  const services = [
     {
-      title: 'Top 10 Adventure Destinations',
-      excerpt: 'Discover the most thrilling destinations for adventure seekers.',
-      image: 'https://source.unsplash.com/random/300x200?adventure',
-      author: 'John Doe',
-      date: 'March 15, 2024',
+      title: 'Adventure Tours',
+      description: 'Experience thrilling adventures with our expert guides.',
+      image: 'https://images.openai.com/static-rsc-4/HkwuKvun4mvYh3hRCwA7ggxpAQNzT6hZlcDwN1OWvKrjMyq5dFU58mvQ_bdJlEpR8vlcUWHjlpGHDiYk9zKcWQPtuHdJwu6A0r5h_OtUacRA7ymHTVzN_mfSQg9KsgFGQ2cM07kcwiNy_s1bg1RhVWislmiUIP_iNTMquO1mcA86sAtBMxL5TyKv_ghdNQGo?purpose=fullsize',
     },
     {
-      title: 'Sustainable Travel Tips',
-      excerpt: 'Learn how to travel responsibly and reduce your environmental impact.',
-      image: 'https://source.unsplash.com/random/300x200?sustainability',
-      author: 'Jane Smith',
-      date: 'March 10, 2024',
+      title: 'Cultural Experiences',
+      description: 'Immerse yourself in local cultures and traditions.',
+      image: 'https://images.openai.com/static-rsc-4/B2aShIXve1Xe9SOxttbgTlrOj2O7AmhRgiHjzTN2MdSAlRze2sM6XnvOvNL2RwdbFSXgbscR9bNDD5ExHp8etFi1Mn-LXKUIptbZpa8ZG8O2K77rmmZudkfRHcBBbwZ3b1TQEzwbT2EBGhFjSz6AcKL9UoF-O3IrY20N0RCYuthemsjsWy1oVY6BISXLDoUk?purpose=fullsize',
     },
     {
-      title: 'Hidden Gems of Europe',
-      excerpt: 'Explore the lesser-known but equally amazing destinations in Europe.',
-      image: 'https://source.unsplash.com/random/300x200?europe',
-      author: 'Mike Johnson',
-      date: 'March 5, 2024',
+      title: 'Luxury Travel',
+      description: 'Indulge in premium travel experiences with our luxury packages.',
+      image: 'https://images.openai.com/static-rsc-4/bDa_SRAeJvvUQhjvhdROuUTBS2TTFxbXrSZ8PZaFlFOMv-QuwKN_5yqne0-rKj6IsAHwAG52hFT4nU2J8uLOyiraLqUM9vPOnBDEZhphbYOcXbOOTXUCCP8aJ-NdC084iZ0nLSLwtseKIOgXOD_xBHkH0w4xsvFGyTa5Ub3W9zq0raO9c1DVgfHPC-f0dgLj?purpose=fullsize',
     },
   ];
 
@@ -36,17 +30,19 @@ const Blog = () => {
           transition={{ duration: 0.8 }}
         >
           <Typography variant="h2" component="h1" className="section-title" sx={{ fontFamily: 'Montserrat, Poppins, sans-serif', color: 'var(--primary-color)', fontWeight: 700 }}>
-            Travel Blog
+
+            Our Services
           </Typography>
         </motion.div>
         <Grid container spacing={4}>
-          {blogPosts.map((post, index) => (
+          {services.map((service, index) => (
             <Grid item xs={12} md={4} key={index}>
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
+
               >
                 <Card
                   sx={{
@@ -76,8 +72,8 @@ const Blog = () => {
                     <CardMedia
                       component="img"
                       height="250"
-                      image={post.image}
-                      alt={post.title}
+                      image={service.image}
+                      alt={service.title}
                       sx={{
                         transition: 'transform 0.5s ease',
                         '&:hover': {
@@ -114,22 +110,7 @@ const Blog = () => {
                         fontFamily: 'Montserrat, Poppins, sans-serif',
                       }}
                     >
-                      {post.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      gutterBottom
-                      sx={{
-                        mb: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        color: 'var(--text-light)',
-                      }}
-                    >
-                      <span>By {post.author}</span>
-                      <span>•</span>
-                      <span>{post.date}</span>
+                      {service.title}
                     </Typography>
                     <Typography
                       sx={{
@@ -137,7 +118,7 @@ const Blog = () => {
                         lineHeight: 1.8,
                       }}
                     >
-                      {post.excerpt}
+                      {service.description}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -150,4 +131,4 @@ const Blog = () => {
   );
 };
 
-export default Blog; 
+export default Services; 

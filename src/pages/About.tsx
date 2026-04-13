@@ -1,7 +1,7 @@
 import { Container, Typography, Box, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
 
-const About = () => {
+const About: React.FC = () => {
   return (
     <Container>
       <Box sx={{ py: 8 }}>
@@ -52,7 +52,7 @@ const About = () => {
                   Our Story
                 </Typography>
                 <Typography paragraph sx={{ color: 'var(--text-light)' }}>
-                  Travel Adventures was founded with a simple mission: to help people discover the world's most amazing destinations and create unforgettable experiences. Our team of passionate travelers and adventure enthusiasts work tirelessly to curate the best travel experiences for our clients.
+                  Token of Memento was founded with a simple mission: to help people discover the world's most amazing destinations and create unforgettable experiences. Our team of passionate travelers and adventure enthusiasts work tirelessly to curate the best travel experiences for our clients.
                 </Typography>
               </Box>
             </motion.div>

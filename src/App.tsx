@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -13,19 +13,7 @@ import Signup from './pages/Signup';
 import Buy from "./pages/Buy";
 import './styles/index.css';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#2196f3',
-    },
-    secondary: {
-      main: '#f50057',
-    },
-  },
-  typography: {
-    fontFamily: "'Poppins', sans-serif",
-  },
-});
+import theme from './theme/theme';
 
 function App() {
   return (
