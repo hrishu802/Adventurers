@@ -1,27 +1,15 @@
-import { Container, Typography, Box, Grid, Slider, FormControl, Select, MenuItem, Checkbox, FormGroup, FormControlLabel, Divider } from '@mui/material';
+import { Container, Typography, Box, Grid, Slider, FormControl, Select, MenuItem, Divider } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import React, { useState, useMemo, useEffect } from 'react';
 import AdventureCard from '../components/AdventureCard';
 import Button from '../components/Button';
-import { Destination } from '../types';
+import { DestinationRepository } from '../services/DestinationRepository';
+import { DestinationFilter } from '../services/DestinationFilter';
+import { SortContext, SortType } from '../strategies/SortStrategy';
 
-// Dummy centralized data (merged for robust explore page)
-const allData: Destination[] = [
-  { id: 1, location: 'Bali', type: 'activity', title: 'Beach Paradise', price: 299, rating: 4.8, image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800' },
-  { id: 2, location: 'Bali', type: 'activity', title: 'Cultural Tour', price: 199, rating: 4.6, image: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800' },
-  { id: 3, location: 'Bali', type: 'package', title: 'Luxury Escape', price: 999, rating: 4.9, image: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=800' },
-  { id: 4, location: 'Tokyo', type: 'activity', title: 'Food Tour', price: 149, rating: 4.8, image: 'https://images.unsplash.com/photo-1540822838183-1763ef8088ae?auto=format&fit=crop&w=800' },
-  { id: 5, location: 'Tokyo', type: 'package', title: 'Premium Tokyo', price: 1299, rating: 4.9, image: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=800' },
-  { id: 6, location: 'Paris', type: 'activity', title: 'Eiffel Tower Tour', price: 99, rating: 4.7, image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=800' },
-  { id: 7, location: 'Paris', type: 'package', title: 'Romantic Paris', price: 1299, rating: 4.8, image: 'https://images.unsplash.com/photo-1502602859462-226d1da32407?auto=format&fit=crop&w=800' },
-  { id: 8, location: 'New York', type: 'activity', title: 'Broadway Show', price: 149, rating: 4.9, image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800' },
-  { id: 9, location: 'New York', type: 'package', title: 'NYC Explorer', price: 1499, rating: 4.8, image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800' },
-  { id: 10, location: 'Rome', type: 'activity', title: 'Colosseum Tour', price: 79, rating: 4.7, image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800' },
-  { id: 11, location: 'Rome', type: 'package', title: 'Roman Holiday', price: 1199, rating: 4.9, image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800' }
-];
-
-const locations = ['All', 'Bali', 'Tokyo', 'Paris', 'New York', 'Rome'];
+const repository = DestinationRepository.getInstance();
+const locations = repository.getLocations();
 
 const DestinationPackages: React.FC = () => {
   const { destination } = useParams<{ destination: string }>();
@@ -40,22 +28,16 @@ const DestinationPackages: React.FC = () => {
     }
   }, [destination]);
 
-  // Derived filtered Data
+  // Derived filtered Data through repository and strategy objects
   const filteredData = useMemo(() => {
-    let result = allData.filter(item => {
-      if (selectedLocation !== 'All' && item.location !== selectedLocation) return false;
-      if (item.price < priceRange[0] || item.price > priceRange[1]) return false;
-      if (item.rating < minRating) return false;
-      return true;
-    });
+    const filter = new DestinationFilter()
+      .setLocation(selectedLocation)
+      .setPriceRange([priceRange[0], priceRange[1]])
+      .setRating(minRating);
 
-    result.sort((a, b) => {
-      if (sortBy === 'priceAsc') return a.price - b.price;
-      if (sortBy === 'priceDesc') return b.price - a.price;
-      return b.rating - a.rating; // default popularity
-    });
+    const sortStrategy = SortContext.getStrategy(sortBy as SortType);
 
-    return result;
+    return repository.getDestinations(filter, sortStrategy);
   }, [priceRange, selectedLocation, minRating, sortBy]);
 
   const handleBuy = (item: Destination) => {

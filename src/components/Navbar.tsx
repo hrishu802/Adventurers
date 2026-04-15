@@ -3,6 +3,9 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import Button from './Button';
+import { NavService } from '../services/NavService';
+
+const navService = new NavService();
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
@@ -10,12 +13,8 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
-  const navItems: Array<{ name: string; path: string }> = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Services', path: '/services' },
-    { name: 'Blog', path: '/blog' },
-  ];
+  const navItems = navService.getPrimaryItems();
+  const authItems = navService.getAuthItems();
 
   return (
     <AppBar position="sticky" sx={{ bgcolor: 'secondary.main', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
@@ -82,12 +81,22 @@ const Navbar: React.FC = () => {
               </Typography>
             ))}
             <Box ml={2} display="flex" gap={2}>
-              <Typography component={RouterLink} to="/login" sx={{ color: '#fff', textDecoration: 'none', fontWeight: 500, alignSelf: 'center', transition: '0.3s', '&:hover': { color: 'accent.main' } }}>
-                Login
-              </Typography>
-              <Button variant="accent" component={RouterLink} to="/signup">
-                Sign Up
-              </Button>
+              {authItems.map((item) => (
+                item.name === 'Sign Up' ? (
+                  <Button key={item.path} variant="accent" component={RouterLink} to={item.path}>
+                    {item.name}
+                  </Button>
+                ) : (
+                  <Typography
+                    key={item.path}
+                    component={RouterLink}
+                    to={item.path}
+                    sx={{ color: '#fff', textDecoration: 'none', fontWeight: 500, alignSelf: 'center', transition: '0.3s', '&:hover': { color: 'accent.main' } }}
+                  >
+                    {item.name}
+                  </Typography>
+                )
+              ))}
             </Box>
           </Box>
         )}

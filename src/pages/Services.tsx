@@ -1,24 +1,11 @@
 import { Container, Typography, Box, Grid, Card, CardContent, CardMedia } from '@mui/material';
 import { motion } from 'framer-motion';
+import { PageContentService } from '../services/PageContentService';
+
+const contentService = new PageContentService();
 
 const Services: React.FC = () => {
-  const services = [
-    {
-      title: 'Adventure Tours',
-      description: 'Experience thrilling adventures with our expert guides.',
-      image: 'https://images.openai.com/static-rsc-4/HkwuKvun4mvYh3hRCwA7ggxpAQNzT6hZlcDwN1OWvKrjMyq5dFU58mvQ_bdJlEpR8vlcUWHjlpGHDiYk9zKcWQPtuHdJwu6A0r5h_OtUacRA7ymHTVzN_mfSQg9KsgFGQ2cM07kcwiNy_s1bg1RhVWislmiUIP_iNTMquO1mcA86sAtBMxL5TyKv_ghdNQGo?purpose=fullsize',
-    },
-    {
-      title: 'Cultural Experiences',
-      description: 'Immerse yourself in local cultures and traditions.',
-      image: 'https://images.openai.com/static-rsc-4/B2aShIXve1Xe9SOxttbgTlrOj2O7AmhRgiHjzTN2MdSAlRze2sM6XnvOvNL2RwdbFSXgbscR9bNDD5ExHp8etFi1Mn-LXKUIptbZpa8ZG8O2K77rmmZudkfRHcBBbwZ3b1TQEzwbT2EBGhFjSz6AcKL9UoF-O3IrY20N0RCYuthemsjsWy1oVY6BISXLDoUk?purpose=fullsize',
-    },
-    {
-      title: 'Luxury Travel',
-      description: 'Indulge in premium travel experiences with our luxury packages.',
-      image: 'https://images.openai.com/static-rsc-4/bDa_SRAeJvvUQhjvhdROuUTBS2TTFxbXrSZ8PZaFlFOMv-QuwKN_5yqne0-rKj6IsAHwAG52hFT4nU2J8uLOyiraLqUM9vPOnBDEZhphbYOcXbOOTXUCCP8aJ-NdC084iZ0nLSLwtseKIOgXOD_xBHkH0w4xsvFGyTa5Ub3W9zq0raO9c1DVgfHPC-f0dgLj?purpose=fullsize',
-    },
-  ];
+  const services = contentService.getServices();
 
   return (
     <Container>

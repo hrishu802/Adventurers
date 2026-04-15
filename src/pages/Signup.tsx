@@ -3,16 +3,20 @@ import { useNavigate, Link } from "react-router-dom";
 import { Box, Grid, Typography, TextField, Checkbox, FormControlLabel } from '@mui/material';
 import { motion } from "framer-motion";
 import Button from '../components/Button';
+import { AuthFormContext } from '../services/AuthFormService';
 
 const Signup: React.FC = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const authStrategy = AuthFormContext.getStrategy('signup');
+  const [formState, setFormState] = useState<Record<string, string>>({ name: '', email: '', password: '' });
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     navigate("/login");
+  };
+
+  const handleChange = (name: string, value: string) => {
+    setFormState(prev => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -44,32 +48,18 @@ const Signup: React.FC = () => {
               <Typography variant="body1" color="text.secondary" mb={4}>Let's get you set up so you can start traveling.</Typography>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <TextField
-                  label="Full Name"
-                  variant="outlined"
-                  fullWidth
-                  required
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                />
-                <TextField
-                  label="Email Address"
-                  type="email"
-                  variant="outlined"
-                  fullWidth
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-                <TextField
-                  label="Password"
-                  type="password"
-                  variant="outlined"
-                  fullWidth
-                  required
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
+                {authStrategy.getFields().map(field => (
+                  <TextField
+                    key={field.name}
+                    label={field.label}
+                    type={field.type}
+                    variant="outlined"
+                    fullWidth
+                    required={field.required}
+                    value={formState[field.name] || ''}
+                    onChange={e => handleChange(field.name, e.target.value)}
+                  />
+                ))}
 
                 <FormControlLabel
                   control={<Checkbox color="primary" required />}
@@ -77,14 +67,14 @@ const Signup: React.FC = () => {
                 />
 
                 <Button variant="accent" type="submit" sx={{ py: 1.5, fontSize: '1.1rem', mt: 2 }}>
-                  Create Account
+                  {authStrategy.getSubmitLabel()}
                 </Button>
               </form>
 
               <Typography variant="body2" color="text.secondary" align="center" mt={4}>
-                Already have an account?{' '}
-                <Link to="/login" style={{ color: '#FF6B35', fontWeight: 600, textDecoration: 'none' }}>
-                  Login
+                {authStrategy.getFooterText()}{' '}
+                <Link to={authStrategy.getFooterLinkPath()} style={{ color: '#FF6B35', fontWeight: 600, textDecoration: 'none' }}>
+                  {authStrategy.getFooterLinkLabel()}
                 </Link>
               </Typography>
             </Box>

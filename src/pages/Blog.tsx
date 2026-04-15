@@ -1,30 +1,11 @@
 import { Container, Typography, Box, Grid, Card, CardContent, CardMedia } from '@mui/material';
 import { motion } from 'framer-motion';
+import { PageContentService } from '../services/PageContentService';
+
+const contentService = new PageContentService();
 
 const Blog: React.FC = () => {
-  const blogPosts = [
-    {
-      title: 'Top 10 Adventure Destinations',
-      excerpt: 'Discover the most thrilling destinations for adventure seekers.',
-      image: 'https://images.openai.com/static-rsc-4/NWECLQVk15Z4l-1NdjIp074ReRBXGGLDqOvttgFC13KEGc7QfhOvOYCIp8sjkVYTS_qOhQ7L3kfxAobdhSbWI-DvYTLA4AHTUinAKZl2gZzWiENt_9KVTCr4ISphrWLvqxoPWd-G7udS1l5PtBhx9tYSK_19wDbu0j-UnqUxYAZcJElI4YRlT9Xj2CyxJ5Cf?purpose=fullsize',
-      author: 'John Doe',
-      date: 'March 15, 2024',
-    },
-    {
-      title: 'Sustainable Travel Tips',
-      excerpt: 'Learn how to travel responsibly and reduce your environmental impact.',
-      image: 'https://images.openai.com/static-rsc-4/B8w_GTUDXahvfOxFgRc0MZIUcEERBqMDyy8_Fn-EBFrQ4XsXDQcOjEwZFMeA-fvjIgxclFKwrVRd-TZU8wzvT3M2xrDOrr8PwA_mc8cN_8KQpq68agdo68XKUYNn1xeO-waLqVtxVckZnEknTmHDcR7eKO84bgH9LNMSGGYYYMtcy2gsVa6CpEQ200IQ59D2?purpose=fullsize',
-      author: 'Jane Smith',
-      date: 'March 10, 2024',
-    },
-    {
-      title: 'Hidden Gems of Europe',
-      excerpt: 'Explore the lesser-known but equally amazing destinations in Europe.',
-      image: 'https://images.openai.com/static-rsc-4/0gu7DyJWPUeIGlLATGeWooo-P8bSRwuCQO92mrXREkAQLTnr-Fb8wnvudrrvV-I9HrUgWfvIKQ2XlO_nQW7TfCGgk9fI-vn51dwSEok9kq4XZ8l7YeAsCpWmLoeelrf7pHEK7veIxjm8yjSyPZa202R5nLTFn3O-gzGNdIxFOdxmDgjfGT_7F65FEkjTR-7D?purpose=fullsize',
-      author: 'Mike Johnson',
-      date: 'March 5, 2024',
-    },
-  ];
+  const blogPosts = contentService.getBlogPosts();
 
   return (
     <Container>

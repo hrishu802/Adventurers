@@ -1,6 +1,9 @@
 import React from "react";
 import { FaInstagram, FaTwitter, FaFacebook, FaLinkedin, FaArrowUp } from "react-icons/fa";
 import { Box, Typography, Container, IconButton } from "@mui/material";
+import { FooterService } from '../services/FooterService';
+
+const footerService = new FooterService();
 
 const Footer: React.FC = () => (
   <Box
@@ -27,18 +30,31 @@ const Footer: React.FC = () => (
         </Box>
 
         <Box display="flex" gap={3} mb={{ xs: 3, md: 0 }}>
-          {['Explore', 'Destinations', 'About Us', 'Contact'].map(link => (
-            <Typography key={link} variant="body2" sx={{ cursor: 'pointer', transition: '0.3s', '&:hover': { color: 'accent.main' } }}>
-              {link}
+          {footerService.getLinks().map(link => (
+            <Typography key={link.label} variant="body2" sx={{ cursor: link.path ? 'pointer' : 'default', transition: '0.3s', '&:hover': { color: link.path ? 'accent.main' : 'inherit' } }}>
+              {link.label}
             </Typography>
           ))}
         </Box>
 
         <Box display="flex" gap={2}>
-          <FaInstagram style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />
-          <FaTwitter style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />
-          <FaFacebook style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />
-          <FaLinkedin style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />
+          {footerService.getSocialLinks().map((social) => {
+            const icon = (() => {
+              switch (social.icon) {
+                case 'twitter':
+                  return <FaTwitter style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
+                case 'facebook':
+                  return <FaFacebook style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
+                case 'linkedin':
+                  return <FaLinkedin style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
+                case 'instagram':
+                default:
+                  return <FaInstagram style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
+              }
+            })();
+
+            return <Box key={social.label}>{icon}</Box>;
+          })}
         </Box>
       </Box>
 

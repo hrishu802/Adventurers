@@ -5,13 +5,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StarIcon from '@mui/icons-material/Star';
 import Button from '../components/Button';
+import { BookingService } from '../services/BookingService';
+import { PaymentContext, PaymentType } from '../strategies/PaymentStrategy';
 
 const Buy: React.FC = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState('details'); // details -> payment -> success
-  const [paymentType, setPaymentType] = useState('card');
+  const [step, setStep] = useState<'details' | 'payment' | 'success'>('details');
+  const [paymentType, setPaymentType] = useState<PaymentType>('card');
+  const bookingService = new BookingService();
+  const paymentStrategy = PaymentContext.getStrategy(paymentType);
 
   if (!data) {
     return (
@@ -26,12 +30,12 @@ const Buy: React.FC = () => {
 
   const handleDetailsSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStep('payment');
+    setStep(bookingService.submitDetails());
   };
 
   const handlePaymentSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTimeout(() => setStep('success'), 1000);
+    setTimeout(() => setStep(bookingService.submitPayment()), 1000);
   };
 
   return (
@@ -117,17 +121,31 @@ const Buy: React.FC = () => {
                           </RadioGroup>
                         </FormControl>
 
-                        {paymentType === 'card' && (
+                        {paymentStrategy.getFields().length > 0 ? (
                           <Box mb={3}>
-                            <TextField fullWidth label="Card Number" required sx={{ mb: 2 }} />
-                            <Grid container spacing={2}>
-                              <Grid item xs={6}><TextField fullWidth label="MM/YY" required /></Grid>
-                              <Grid item xs={6}><TextField fullWidth label="CVV" required type="password" /></Grid>
-                            </Grid>
+                            {paymentStrategy.getFields().map(field => (
+                              <TextField
+                                key={field.name}
+                                fullWidth
+                                name={field.name}
+                                label={field.label}
+                                required={field.required}
+                                type={field.type}
+                                sx={{ mb: 2 }}
+                              />
+                            ))}
                           </Box>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary" mb={3}>
+                            You will be redirected to PayPal to complete your secure payment.
+                          </Typography>
                         )}
-                        <Button variant="accent" type="submit" fullWidth sx={{ py: 1.5, fontSize: '1.1rem' }}>Pay ${data.price}</Button>
-                        <Button variant="text" fullWidth onClick={() => setStep('details')} sx={{ mt: 1, color: 'text.secondary' }}>Back</Button>
+                        <Button variant="accent" type="submit" fullWidth sx={{ py: 1.5, fontSize: '1.1rem' }}>
+                          {paymentStrategy.getSubmitButtonLabel(data.price)}
+                        </Button>
+                        <Button variant="text" fullWidth onClick={() => setStep(bookingService.reset())} sx={{ mt: 1, color: 'text.secondary' }}>
+                          Back
+                        </Button>
                       </motion.form>
                     )}
 

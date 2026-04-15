@@ -1,15 +1,17 @@
 import { Box, Typography, Container, Grid, Autocomplete, TextField, Avatar } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaHeadset, FaStar, FaShieldAlt } from 'react-icons/fa';
 import Button from '../components/Button';
 import AdventureCard from '../components/AdventureCard';
-import SearchBar from '../components/SearchBar';
+import { HomeContentService, SearchSuggestion, WhyChooseItem } from '../services/HomeContentService';
+
+const homeService = new HomeContentService();
 
 const Home: React.FC = () => {
   const [searchValue, setSearchValue] = useState<string>('');
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const navigate = useNavigate();
 
   const heroImages = [
@@ -21,53 +23,31 @@ const Home: React.FC = () => {
   const packagesRef = useRef<HTMLDivElement | null>(null);
   const [newsletterSuccess, setNewsletterSuccess] = useState<boolean>(false);
 
-  const localCountries = [
-    { name: 'Paris', capital: 'France', flag: '🇫🇷' },
-    { name: 'Tokyo', capital: 'Japan', flag: '🇯🇵' },
-    { name: 'Bali', capital: 'Indonesia', flag: '🇮🇩' },
-    { name: 'New York', capital: 'USA', flag: '🇺🇸' },
-    { name: 'Rome', capital: 'Italy', flag: '🇮🇹' }
-  ];
-
-  const handleSearchChange = (event: any, newValue: string) => {
+  const handleSearchChange = (_event: any, newValue: string) => {
     setSearchValue(newValue);
-    if (newValue) {
-      const filtered = localCountries.filter(country =>
-        country.name.toLowerCase().includes(newValue.toLowerCase())
-      ).slice(0, 5);
-      setSuggestions(filtered);
-    } else {
-      setSuggestions([]);
-    }
+    setSuggestions(homeService.getSearchSuggestions(newValue));
   };
 
   const handleDestinationClick = (destination: string) => {
     navigate(`/destination/${destination.toLowerCase().replace(/\s+/g, '-')}`);
   };
 
-  const featuredDestinations = [
-    { name: 'Paris', location: 'France', rating: 4.8, price: 899, image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=800' },
-    { name: 'Tokyo', location: 'Japan', rating: 4.9, price: 1200, image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800' },
-    { name: 'Bali', location: 'Indonesia', rating: 4.7, price: 499, image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800' },
-  ];
+  const featuredDestinations = useMemo(() => homeService.getFeaturedDestinations(), []);
+  const popularPackages = useMemo(() => homeService.getPopularPackages(), []);
+  const whyChooseUs = homeService.getWhyChooseUs();
+  const testimonials = homeService.getTestimonials();
 
-  const popularPackages = [
-    { name: 'Swiss Alps Hiking', location: 'Switzerland', rating: 4.9, price: 1099, image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800' },
-    { name: 'Maldives Retreat', location: 'Maldives', rating: 4.8, price: 1599, image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800' },
-    { name: 'Dubai City Tours', location: 'UAE', rating: 4.7, price: 699, image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800' },
-  ];
-
-  const whyChooseUs = [
-    { icon: <FaShieldAlt size={32} color="#FF6B35" />, title: 'Secure Bookings', desc: 'Your payments and data are fully safe.' },
-    { icon: <FaStar size={32} color="#FF6B35" />, title: 'Premium Service', desc: 'We offer curated luxury experiences.' },
-    { icon: <FaHeadset size={32} color="#FF6B35" />, title: '24/7 Support', desc: 'Always available to help on your trip.' },
-  ];
-
-  const testimonials = [
-    { name: 'Amit Sharma', review: 'Flawless travel experience!' },
-    { name: 'Sara Lee', review: 'Incredible destinations and support.' },
-    { name: 'John Doe', review: 'The best packages available.' },
-  ];
+  const renderFeatureIcon = (iconName: WhyChooseItem['iconName']) => {
+    switch (iconName) {
+      case 'shield':
+        return <FaShieldAlt size={32} color="#FF6B35" />;
+      case 'star':
+        return <FaStar size={32} color="#FF6B35" />;
+      case 'headset':
+      default:
+        return <FaHeadset size={32} color="#FF6B35" />;
+    }
+  };
 
   const scrollToPackages = () => packagesRef.current?.scrollIntoView({ behavior: 'smooth' });
 
@@ -181,7 +161,7 @@ const Home: React.FC = () => {
                 <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <Box textAlign="center" p={3}>
                     <Box sx={{ mb: 2, display: 'inline-block', p: 2, bgcolor: '#FFF3E0', borderRadius: '50%' }}>
-                      {feature.icon}
+                      {renderFeatureIcon(feature.iconName)}
                     </Box>
                     <Typography variant="h5" color="secondary.main" gutterBottom fontWeight={600}>
                       {feature.title}

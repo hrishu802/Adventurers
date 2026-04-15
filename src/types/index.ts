@@ -1,5 +1,8 @@
 // Global Application Types
 
+export type DestinationType = 'package' | 'activity';
+export type BookingStep = 'details' | 'payment' | 'success';
+
 export interface Destination {
     id: number | string;
     name?: string;
@@ -8,7 +11,7 @@ export interface Destination {
     rating: number;
     price: number;
     image: string;
-    type?: 'package' | 'activity';
+    type?: DestinationType;
     description?: string;
     desc?: string;
     duration?: string;
