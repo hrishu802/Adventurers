@@ -100,9 +100,13 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
     const user = await User.findById(req.params.id);
 
     if (user) {
-      user.name = req.body.name || user.name;
-      user.email = req.body.email || user.email;
-      user.location = req.body.location || user.location;
+      // Update basic info
+      user.name = req.body.name !== undefined ? req.body.name : user.name;
+      user.email = req.body.email !== undefined ? req.body.email : user.email;
+      user.location = req.body.location !== undefined ? req.body.location : user.location;
+      user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
+      user.avatar = req.body.avatar !== undefined ? req.body.avatar : user.avatar;
+      user.coverImage = req.body.coverImage !== undefined ? req.body.coverImage : user.coverImage;
       
       if (req.body.password) {
         user.password = req.body.password;
@@ -115,6 +119,7 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
         name: updatedUser.name,
         email: updatedUser.email,
         location: updatedUser.location,
+        bio: updatedUser.bio,
         avatar: updatedUser.avatar,
         coverImage: updatedUser.coverImage,
         stats: updatedUser.stats,

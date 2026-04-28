@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Grid, Typography, Avatar, Paper, Tab, Tabs, Chip, Divider, IconButton } from '@mui/material';
+import { Box, Container, Grid, Typography, Avatar, Paper, Tab, Tabs, Chip, Divider, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import EditIcon from '@mui/icons-material/Edit';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -67,6 +67,16 @@ const Profile: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    location: '',
+    bio: '',
+    avatar: '',
+    coverImage: ''
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,6 +101,52 @@ const Profile: React.FC = () => {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleOpenEditModal = () => {
+    if (user) {
+      setEditForm({
+        name: user.name || '',
+        location: user.location || '',
+        bio: user.bio || '',
+        avatar: user.avatar || '',
+        coverImage: user.coverImage || ''
+      });
+      setIsEditModalOpen(true);
+      setUpdateError(null);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateProfile = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    if (!editForm.name.trim()) {
+      setUpdateError("Name is required");
+      return;
+    }
+
+    setUpdateLoading(true);
+    setUpdateError(null);
+
+    try {
+      const updatedData = await userService.updateProfile(userId, editForm);
+      setUser(updatedData);
+      handleCloseEditModal();
+    } catch (error: any) {
+      setUpdateError(error.message || "Failed to update profile");
+    } finally {
+      setUpdateLoading(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -125,7 +181,10 @@ const Profile: React.FC = () => {
         }}
       >
         <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.4))' }} />
-        <IconButton sx={{ position: 'absolute', bottom: 16, right: 16, bgcolor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}>
+        <IconButton 
+          onClick={handleOpenEditModal}
+          sx={{ position: 'absolute', bottom: 16, right: 16, bgcolor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}
+        >
           <EditIcon />
         </IconButton>
       </Box>
@@ -139,7 +198,10 @@ const Profile: React.FC = () => {
               <Paper elevation={0} sx={{ p: 4, borderRadius: 4, boxShadow: '0 8px 32px rgba(0,0,0,0.06)', textAlign: 'center', bgcolor: '#fff' }}>
                 <Box sx={{ position: 'relative', display: 'inline-block' }}>
                   <Avatar src={user.avatar || MOCK_USER.avatar} sx={{ width: 150, height: 150, border: '6px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                  <IconButton sx={{ position: 'absolute', bottom: 4, right: 4, bgcolor: 'secondary.main', color: '#fff', width: 36, height: 36, '&:hover': { bgcolor: 'secondary.dark' } }}>
+                  <IconButton 
+                    onClick={handleOpenEditModal}
+                    sx={{ position: 'absolute', bottom: 4, right: 4, bgcolor: 'secondary.main', color: '#fff', width: 36, height: 36, '&:hover': { bgcolor: 'secondary.dark' } }}
+                  >
                     <EditIcon sx={{ fontSize: 20 }} />
                   </IconButton>
                 </Box>
@@ -151,10 +213,14 @@ const Profile: React.FC = () => {
                   <LocationOnIcon fontSize="small" />
                   <Typography variant="body2">{user.location || MOCK_USER.location}</Typography>
                 </Box>
-                <Box display="flex" justifyContent="center" alignItems="center" gap={1} mb={3} color="text.secondary">
+                <Box display="flex" justifyContent="center" alignItems="center" gap={1} mb={2} color="text.secondary">
                   <CalendarMonthIcon fontSize="small" />
                   <Typography variant="body2">{MOCK_USER.joinedDate}</Typography>
                 </Box>
+
+                <Typography variant="body2" color="text.secondary" px={2} mb={3} sx={{ fontStyle: 'italic' }}>
+                  "{user.bio || 'No bio yet.'}"
+                </Typography>
 
                 <Divider sx={{ my: 3 }} />
 
@@ -173,7 +239,14 @@ const Profile: React.FC = () => {
                   </Grid>
                 </Grid>
 
-                <Button variant="accent" fullWidth sx={{ mt: 4, py: 1.5 }}>Edit Profile</Button>
+                <Button 
+                  variant="accent" 
+                  fullWidth 
+                  sx={{ mt: 4, py: 1.5 }}
+                  onClick={handleOpenEditModal}
+                >
+                  Edit Profile
+                </Button>
               </Paper>
             </motion.div>
           </Grid>
@@ -263,6 +336,40 @@ const Profile: React.FC = () => {
           </Grid>
         </Grid>
       </Container>
+      <Dialog open={isEditModalOpen} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>Edit Your Profile</DialogTitle>
+        <DialogContent dividers>
+          {updateError && <Alert severity="error" sx={{ mb: 2 }}>{updateError}</Alert>}
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Full Name" name="name" value={editForm.name} onChange={handleInputChange} margin="normal" />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Location" name="location" value={editForm.location} onChange={handleInputChange} margin="normal" />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Bio" name="bio" value={editForm.bio} onChange={handleInputChange} margin="normal" multiline rows={3} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Avatar URL" name="avatar" value={editForm.avatar} onChange={handleInputChange} margin="normal" />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Cover Image URL" name="coverImage" value={editForm.coverImage} onChange={handleInputChange} margin="normal" />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={handleCloseEditModal} color="inherit">Cancel</Button>
+          <Button 
+            onClick={handleUpdateProfile} 
+            variant="accent" 
+            disabled={updateLoading}
+            sx={{ minWidth: 120 }}
+          >
+            {updateLoading ? <CircularProgress size={24} color="inherit" /> : 'Save Changes'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
