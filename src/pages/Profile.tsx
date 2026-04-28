@@ -328,7 +328,23 @@ const Profile: React.FC = () => {
                      <Typography variant="h6" fontWeight={700} color="secondary.main" mb={3}>Account Settings</Typography>
                      <Typography variant="body1" color="text.secondary" mb={4}>Manage your account preferences and settings here.</Typography>
                      <Button variant="outlined" sx={{ mr: 2 }}>Change Password</Button>
-                     <Button variant="outlined" sx={{ color: 'error.main', borderColor: 'error.main', '&:hover': { bgcolor: 'error.50', borderColor: 'error.main' } }} onClick={handleDeleteAccount}>Delete Account</Button>
+                     <Button 
+                       variant="outlined" 
+                       sx={{ mr: 2, color: 'error.main', borderColor: 'error.main', '&:hover': { bgcolor: 'error.50', borderColor: 'error.main' } }} 
+                       onClick={handleDeleteAccount}
+                     >
+                       Delete Account
+                     </Button>
+                     <Button 
+                       variant="accent" 
+                       sx={{ bgcolor: 'secondary.main', '&:hover': { bgcolor: 'secondary.dark' } }} 
+                       onClick={() => {
+                         userService.logout();
+                         navigate('/login');
+                       }}
+                     >
+                       Logout
+                     </Button>
                   </CustomTabPanel>
                 </Box>
               </Paper>

@@ -1,9 +1,11 @@
 import { AppBar, Toolbar, Typography, Box, IconButton, useTheme, useMediaQuery } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from './Button';
 import { NavService } from '../services/NavService';
+import { useNavigate } from 'react-router-dom';
+import { userService } from '../services/UserService';
 
 const navService = new NavService();
 
@@ -11,9 +13,31 @@ const Navbar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  const navItems = navService.getPrimaryItems();
+  useEffect(() => {
+    const checkAuth = () => {
+      const userId = localStorage.getItem('userId');
+      setIsLoggedIn(!!userId);
+    };
+    
+    checkAuth();
+    // Listen for storage changes (e.g. from other tabs)
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
+  }, [location]);
+
+  const handleLogout = () => {
+    userService.logout();
+    setIsLoggedIn(false);
+    navigate('/login');
+  };
+
+  const navItems = navService.getPrimaryItems().filter(item => 
+    item.name !== 'Profile' || isLoggedIn
+  );
   const authItems = navService.getAuthItems();
 
   return (
@@ -81,22 +105,28 @@ const Navbar: React.FC = () => {
               </Typography>
             ))}
             <Box ml={2} display="flex" gap={2}>
-              {authItems.map((item) => (
-                item.name === 'Sign Up' ? (
-                  <Button key={item.path} variant="accent" component={RouterLink} to={item.path}>
-                    {item.name}
-                  </Button>
-                ) : (
-                  <Typography
-                    key={item.path}
-                    component={RouterLink}
-                    to={item.path}
-                    sx={{ color: '#fff', textDecoration: 'none', fontWeight: 500, alignSelf: 'center', transition: '0.3s', '&:hover': { color: 'accent.main' } }}
-                  >
-                    {item.name}
-                  </Typography>
-                )
-              ))}
+              {!isLoggedIn ? (
+                authItems.map((item) => (
+                  item.name === 'Sign Up' ? (
+                    <Button key={item.path} variant="accent" component={RouterLink} to={item.path}>
+                      {item.name}
+                    </Button>
+                  ) : (
+                    <Typography
+                      key={item.path}
+                      component={RouterLink}
+                      to={item.path}
+                      sx={{ color: '#fff', textDecoration: 'none', fontWeight: 500, alignSelf: 'center', transition: '0.3s', '&:hover': { color: 'accent.main' } }}
+                    >
+                      {item.name}
+                    </Typography>
+                  )
+                ))
+              ) : (
+                <Button variant="outlined" sx={{ color: '#fff', borderColor: '#fff', '&:hover': { borderColor: 'accent.main', color: 'accent.main' } }} onClick={handleLogout}>
+                  Logout
+                </Button>
+              )}
             </Box>
           </Box>
         )}
