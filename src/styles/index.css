@@ -67,4 +67,8 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+.navbar-brand {
+  color: #ffffff !important;
+}
  

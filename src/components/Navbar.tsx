@@ -46,6 +46,7 @@ const Navbar: React.FC = () => {
         <Typography
           variant="h5"
           component={RouterLink}
+          className="navbar-brand"
           to="/"
           sx={{
             textDecoration: 'none',
