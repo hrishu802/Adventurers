@@ -9,7 +9,8 @@ export class NavService {
       { name: 'Home', path: '/' },
       { name: 'About', path: '/about' },
       { name: 'Services', path: '/services' },
-      { name: 'Blog', path: '/blog' }
+      { name: 'Blog', path: '/blog' },
+      { name: 'Profile', path: '/profile' }
     ];
   }
 

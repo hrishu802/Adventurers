@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Buy from "./pages/Buy";
+import Profile from './pages/Profile';
 import './styles/index.css';
 
 import theme from './theme/theme';
@@ -30,6 +31,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/buy" element={<Buy />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
         <Footer />
       </Router>

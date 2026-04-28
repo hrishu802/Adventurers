@@ -4,15 +4,25 @@ import { Box, Grid, Typography, TextField, Checkbox, FormControlLabel, Divider }
 import { motion } from "framer-motion";
 import Button from '../components/Button';
 import { AuthFormContext } from '../services/AuthFormService';
+import { userService } from '../services/UserService';
 
 const Login: React.FC = () => {
   const authStrategy = AuthFormContext.getStrategy('login');
   const [formState, setFormState] = useState<Record<string, string>>({ email: '', password: '' });
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate("/");
+    try {
+      await userService.login({
+        email: formState.email,
+        password: formState.password
+      });
+      navigate("/profile");
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   const handleChange = (name: string, value: string) => {
@@ -29,6 +39,8 @@ const Login: React.FC = () => {
             <Box sx={{ p: { xs: 4, md: 8 }, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
               <Typography variant="h3" color="secondary.main" fontWeight={700} mb={1}>Welcome Back!</Typography>
               <Typography variant="body1" color="text.secondary" mb={4}>Please enter your details to sign in.</Typography>
+              
+              {error && <Typography color="error" mb={2}>{error}</Typography>}
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {authStrategy.getFields().map(field => (

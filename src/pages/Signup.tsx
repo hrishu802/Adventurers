@@ -4,15 +4,26 @@ import { Box, Grid, Typography, TextField, Checkbox, FormControlLabel } from '@m
 import { motion } from "framer-motion";
 import Button from '../components/Button';
 import { AuthFormContext } from '../services/AuthFormService';
+import { userService } from '../services/UserService';
 
 const Signup: React.FC = () => {
   const authStrategy = AuthFormContext.getStrategy('signup');
   const [formState, setFormState] = useState<Record<string, string>>({ name: '', email: '', password: '' });
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate("/login");
+    try {
+      await userService.register({
+        name: formState.name,
+        email: formState.email,
+        password: formState.password
+      });
+      navigate("/profile");
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   const handleChange = (name: string, value: string) => {
@@ -46,6 +57,8 @@ const Signup: React.FC = () => {
             <Box sx={{ p: { xs: 4, md: 8 }, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
               <Typography variant="h3" color="secondary.main" fontWeight={700} mb={1}>Sign Up</Typography>
               <Typography variant="body1" color="text.secondary" mb={4}>Let's get you set up so you can start traveling.</Typography>
+
+              {error && <Typography color="error" mb={2}>{error}</Typography>}
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {authStrategy.getFields().map(field => (
