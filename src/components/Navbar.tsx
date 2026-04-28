@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
           to="/"
           sx={{
             textDecoration: 'none',
-            color: '#fff',
+            color: '#fff !important',
             fontFamily: 'Poppins, sans-serif',
             fontWeight: 700,
             letterSpacing: 1,

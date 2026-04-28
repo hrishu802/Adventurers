@@ -16,6 +16,8 @@ export interface Destination {
     desc?: string;
     duration?: string;
     includes?: string[];
+    highlights?: string[];
+    itinerary?: { day: number; title: string; description: string }[];
 }
 
 export interface Testimonial {

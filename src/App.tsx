@@ -28,6 +28,7 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/destination/:destination" element={<DestinationPackages />} />
+          <Route path="/packages" element={<DestinationPackages />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/buy" element={<Buy />} />

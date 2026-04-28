@@ -66,24 +66,49 @@ const Buy: React.FC = () => {
                 {data.description || data.desc || "Experience the vacation of your dreams with this exclusive package. Enjoy curated activities, premium accommodations, and stress-free planning."}
               </Typography>
 
-              <Typography variant="h3" color="secondary.main" mb={3}>Highlights</Typography>
-              <Grid container spacing={2} mb={4}>
-                {['Guided Tours', 'Premium Accommodation', 'Meals Included', 'Free Cancellations'].map((highlight, i) => (
-                  <Grid item xs={12} sm={6} key={i}>
-                    <Box display="flex" alignItems="center" color="text.primary">
-                      <StarIcon sx={{ color: 'accent.main', fontSize: '1.2rem', mr: 1 }} />
-                      <Typography>{highlight}</Typography>
-                    </Box>
+              {data.highlights && data.highlights.length > 0 && (
+                <>
+                  <Typography variant="h3" color="secondary.main" mb={3}>Highlights</Typography>
+                  <Grid container spacing={2} mb={4}>
+                    {data.highlights.map((highlight: string, i: number) => (
+                      <Grid item xs={12} sm={6} key={i}>
+                        <Box display="flex" alignItems="center" color="text.primary">
+                          <StarIcon sx={{ color: 'accent.main', fontSize: '1.2rem', mr: 1 }} />
+                          <Typography>{highlight}</Typography>
+                        </Box>
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
-              </Grid>
+                </>
+              )}
 
               <Divider sx={{ my: 4 }} />
 
-              <Typography variant="h3" color="secondary.main" mb={3}>Itinerary / Program</Typography>
-              <Typography variant="body1" color="text.secondary">
-                Detailed day-by-day program will be provided in your confirmation email based on your selected dates and preferences.
+              <Typography variant="h3" color="secondary.main" mb={3}>
+                {data.itinerary ? 'Itinerary / Program' : 'Included Services'}
               </Typography>
+              
+              {data.itinerary ? (
+                <Box>
+                  {data.itinerary.map((item: any) => (
+                    <Box key={item.day} mb={3}>
+                      <Typography variant="h6" color="primary.main" fontWeight={700}>Day {item.day}: {item.title}</Typography>
+                      <Typography variant="body1" color="text.secondary">{item.description}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Grid container spacing={2}>
+                  {(data.includes || ['Guided Tours', 'Premium Accommodation', 'Meals Included', 'Free Cancellations']).map((service: string, i: number) => (
+                    <Grid item xs={12} sm={6} key={i}>
+                      <Box display="flex" alignItems="center" color="text.secondary">
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main', mr: 2 }} />
+                        <Typography>{service}</Typography>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
             </Box>
           </Grid>
 
@@ -91,9 +116,9 @@ const Buy: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Box sx={{ position: 'sticky', top: 100 }}>
               <Card sx={{ borderRadius: 3, boxShadow: '0 12px 32px rgba(29, 58, 95, 0.08)' }}>
-                <Box bgcolor="secondary.main" color="#fff" p={3} textAlign="center">
-                  <Typography variant="h4" fontWeight={700}>
-                    ${data.price} <Typography component="span" variant="body1" color="rgba(255,255,255,0.7)">/ person</Typography>
+                <Box bgcolor="#f8fafc" p={3} textAlign="center" borderBottom="1px solid" borderColor="divider">
+                  <Typography variant="h4" fontWeight={800} color="primary.main">
+                    ${data.price} <Typography component="span" variant="body1" color="text.secondary">/ person</Typography>
                   </Typography>
                 </Box>
 

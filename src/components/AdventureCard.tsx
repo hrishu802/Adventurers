@@ -53,8 +53,8 @@ const AdventureCard: React.FC<AdventureCardProps> = ({ image, title, location, p
 
                 <Box mt="auto" pt={2} display="flex" justifyContent="space-between" alignItems="center" borderTop="1px solid" borderColor="divider">
                     <Box>
-                        <Typography variant="caption" color="text.secondary">Starting from</Typography>
-                        <Typography variant="h3" color="primary.main" fontSize="1.25rem">${price}</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>Starting from</Typography>
+                        <Typography variant="h3" color="primary.main" sx={{ fontSize: '1.4rem', fontWeight: 700 }}>${price}</Typography>
                     </Box>
                     <Button variant="primary" onClick={onExplore}>Explore</Button>
                 </Box>

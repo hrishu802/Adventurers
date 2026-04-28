@@ -183,7 +183,7 @@ const Home: React.FC = () => {
           <Typography variant="h2" color="secondary.main">
             Popular Packages
           </Typography>
-          <Button variant="primary">View All</Button>
+          <Button variant="primary" onClick={() => navigate('/packages')}>View All</Button>
         </Box>
         <Grid container spacing={4}>
           {popularPackages.map((pkg, i) => (
