@@ -126,7 +126,7 @@ const Login: React.FC = () => {
         {/* Right Side - Visual */}
         <div className="hidden lg:block relative overflow-hidden">
           <img 
-            src="https://images.unsplash.com/photo-1517760444937-f6397edcfa8e?auto=format&fit=crop&w=1200" 
+            src="https://images.openai.com/static-rsc-4/yrknSyKy4bhqCr5aOhdnYmT2LoRlgFYEg_dxgKrWt-9QUlasVwKncHIUoEoXkX9DnwH6EHpOqf1zxkqtY7Sj8QLV8mXRraHY_bMf-QBSZZlHmEXTRqCw8tclh6K_Q-2mThvj021-WYcANMONqT0KmtYDmz9cnhH5PL5248n-1E7ryCvs8ETPCjcNJ8S-ZO3M?purpose=fullsize" 
             alt="Login Visual"
             className="w-full h-full object-cover"
           />
