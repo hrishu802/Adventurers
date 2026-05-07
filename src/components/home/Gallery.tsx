@@ -9,12 +9,12 @@ const images = [
   "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2940",
   "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=2940",
   "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=2940",
-  "https://images.unsplash.com/photo-1493246507139-91e8bef99c02?auto=format&fit=crop&q=80&w=2940",
+  "https://images.openai.com/static-rsc-4/gW4zUuc-nlA6ULrC7JcYCHPsuJzYqmdCyMzAB-P0Jdg9FSeKx0uh2hqWuiOE1ok4o4Hk9Ida-gCloJS6yMWBTL0iSnvxsr6IxZ6AWR7i_U1FpQOLExmUnJysndzwvZt359br0iAKo1yv3PVRSxL1s37Ubx8P5SuFYFtJGlxsORA?purpose=inline",
   "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80&w=2940",
   "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=2940",
-  "https://images.unsplash.com/photo-1433086566280-608bd0491115?auto=format&fit=crop&q=80&w=2940",
+  "https://images.openai.com/static-rsc-4/P4bZ-MBO8hVCL4Wae45p_evPn3fVz0k2PKLFG47fSMGXa_PiX-4WT8__hkYfHmL02irBXelbCC1Vl-ckM3hLSwct-EVuZRAPjltKODEqPwy_1yPQzHrAaZmuCOOnLTA959UEYxHSSJ-ykZRmvAbvaHyHOiLwkjAOLSFrn2bWCzqM5k-cbpTwxvIlQv45V7MJ?purpose=inline",
   "https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&q=80&w=2940",
-  "https://images.unsplash.com/photo-1505118380757-91f5f45d8de4?auto=format&fit=crop&q=80&w=2940"
+  "https://images.openai.com/static-rsc-4/KWM04R248nTMRhIFyiLQbr_U2nRJ351K_1iqjcxvTrbon_-GMsL1Fe32aqTvHxb15NYNzoCAKdCE3SkHZa58vIaHHLzNSQKsHFovbziF5UJjWxEQ1uf9uc-RUQx_ejwGkpmFNUmf93k1IY7x1QgAc7_m33wGb3h_igyzwH4aNfZ0vlHfrxNZAGXMtzNOd3wQ?purpose=inline"
 ];
 
 const Gallery: React.FC = () => {
