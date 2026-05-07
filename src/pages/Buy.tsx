@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Grid, Typography, Box, Card, Divider, TextField, FormControl, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { motion, AnimatePresence } from "framer-motion";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import StarIcon from '@mui/icons-material/Star';
+import { 
+  MapPin, 
+  Star, 
+  Calendar, 
+  CreditCard, 
+  ChevronRight, 
+  CheckCircle2, 
+  ArrowLeft,
+  Info,
+  Clock,
+  ShieldCheck,
+  CreditCard as CardIcon
+} from "lucide-react";
+import { cn } from "../utils/cn";
 import Button from '../components/Button';
 import { BookingService } from '../services/BookingService';
 import { PaymentContext, PaymentType } from '../strategies/PaymentStrategy';
@@ -14,15 +25,21 @@ const Buy: React.FC = () => {
 
   const [step, setStep] = useState<'details' | 'payment' | 'success'>('details');
   const [paymentType, setPaymentType] = useState<PaymentType>('card');
+  const [isLoading, setIsLoading] = useState(false);
+  
   const bookingService = new BookingService();
   const paymentStrategy = PaymentContext.getStrategy(paymentType);
 
   if (!data) {
     return (
-      <Container sx={{ py: 10, textAlign: 'center' }}>
-        <Typography variant="h4" color="text.secondary" mb={4}>No package selected.</Typography>
-        <Button onClick={() => navigate(-1)}>Go Back</Button>
-      </Container>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+          <Info className="w-10 h-10 text-text-muted" />
+        </div>
+        <h2 className="text-3xl font-bold text-white mb-4">No package selected</h2>
+        <p className="text-text-muted mb-8 max-w-md">Please select an adventure from our catalog to proceed with booking.</p>
+        <Button variant="primary" onClick={() => navigate('/packages')}>Browse Adventures</Button>
+      </div>
     );
   }
 
@@ -30,171 +47,280 @@ const Buy: React.FC = () => {
 
   const handleDetailsSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStep(bookingService.submitDetails());
+    setStep('payment');
   };
 
   const handlePaymentSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTimeout(() => setStep(bookingService.submitPayment()), 1000);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setStep('success');
+    }, 1500);
   };
 
   return (
-    <Box bgcolor="background.default" minHeight="100vh" pb={8}>
-      {/* Gallery Header */}
-      <Box sx={{ width: '100%', height: { xs: 300, md: 500 }, position: 'relative' }}>
-        <img src={imageUrl} alt={data.title || data.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)', pt: 10, pb: 4, px: { xs: 2, md: 6 } }}>
-          <Container>
-            <Typography variant="h1" color="#fff" fontSize={{ xs: '2rem', md: '3.5rem' }}>
-              {data.title || data.name}
-            </Typography>
-            <Box display="flex" alignItems="center" gap={2} mt={1} color="#E5E7EB">
-              <Box display="flex" alignItems="center"><LocationOnIcon sx={{ mr: 0.5 }} />{data.location || 'Global'}</Box>
-              <Box display="flex" alignItems="center" color="#FF6B35"><StarIcon sx={{ mr: 0.5 }} />{data.rating || '4.8'} (Excellent)</Box>
-            </Box>
-          </Container>
-        </Box>
-      </Box>
+    <div className="min-h-screen bg-background pb-20">
+      {/* Immersive Header */}
+      <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
+        <img src={imageUrl} className="w-full h-full object-cover" alt="Adventure" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+        <div className="absolute bottom-12 left-0 right-0 z-10">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <button 
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors group"
+              >
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                Back to Explorer
+              </button>
+              <h1 className="text-4xl md:text-6xl font-bold font-poppins text-white mb-4">
+                {data.title || data.name}
+              </h1>
+              <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-2 text-white/90">
+                  <MapPin className="w-5 h-5 text-primary-accent" />
+                  <span className="font-medium">{data.location || 'Global Destination'}</span>
+                </div>
+                <div className="flex items-center gap-2 text-secondary-accent">
+                  <Star className="w-5 h-5 fill-secondary-accent" />
+                  <span className="font-bold">{data.rating || '4.8'} (Excellent)</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
 
-      <Container sx={{ mt: 6 }}>
-        <Grid container spacing={6}>
-          {/* Main Details Section */}
-          <Grid item xs={12} md={8}>
-            <Box bgcolor="#fff" p={4} borderRadius={3} boxShadow="0 4px 16px rgba(0,0,0,0.03)" mb={4}>
-              <Typography variant="h3" color="secondary.main" mb={3}>Overview</Typography>
-              <Typography variant="body1" color="text.secondary" lineHeight={1.8} mb={4}>
+      <div className="max-w-7xl mx-auto px-6 mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          
+          {/* Main Content Area */}
+          <div className="lg:col-span-8 space-y-12">
+            {/* Overview Section */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-sm"
+            >
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary-accent/10 rounded-xl flex items-center justify-center">
+                  <Info className="w-4 h-4 text-primary-accent" />
+                </div>
+                Overview
+              </h3>
+              <p className="text-text-muted leading-relaxed text-lg mb-8">
                 {data.description || data.desc || "Experience the vacation of your dreams with this exclusive package. Enjoy curated activities, premium accommodations, and stress-free planning."}
-              </Typography>
+              </p>
 
-              {data.highlights && data.highlights.length > 0 && (
-                <>
-                  <Typography variant="h3" color="secondary.main" mb={3}>Highlights</Typography>
-                  <Grid container spacing={2} mb={4}>
-                    {data.highlights.map((highlight: string, i: number) => (
-                      <Grid item xs={12} sm={6} key={i}>
-                        <Box display="flex" alignItems="center" color="text.primary">
-                          <StarIcon sx={{ color: 'accent.main', fontSize: '1.2rem', mr: 1 }} />
-                          <Typography>{highlight}</Typography>
-                        </Box>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-8 border-t border-white/5">
+                {[
+                  { icon: Clock, label: "Duration", value: "7 Days / 6 Nights" },
+                  { icon: ShieldCheck, label: "Support", value: "24/7 Priority" },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-primary-accent">
+                      <item.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-text-muted uppercase tracking-wider">{item.label}</p>
+                      <p className="text-white font-bold">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
 
-              <Divider sx={{ my: 4 }} />
-
-              <Typography variant="h3" color="secondary.main" mb={3}>
-                {data.itinerary ? 'Itinerary / Program' : 'Included Services'}
-              </Typography>
-              
-              {data.itinerary ? (
-                <Box>
-                  {data.itinerary.map((item: any) => (
-                    <Box key={item.day} mb={3}>
-                      <Typography variant="h6" color="primary.main" fontWeight={700}>Day {item.day}: {item.title}</Typography>
-                      <Typography variant="body1" color="text.secondary">{item.description}</Typography>
-                    </Box>
-                  ))}
-                </Box>
-              ) : (
-                <Grid container spacing={2}>
-                  {(data.includes || ['Guided Tours', 'Premium Accommodation', 'Meals Included', 'Free Cancellations']).map((service: string, i: number) => (
-                    <Grid item xs={12} sm={6} key={i}>
-                      <Box display="flex" alignItems="center" color="text.secondary">
-                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main', mr: 2 }} />
-                        <Typography>{service}</Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              )}
-            </Box>
-          </Grid>
+            {/* Highlights / Itinerary */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-sm"
+            >
+              <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                <div className="w-8 h-8 bg-secondary-accent/10 rounded-xl flex items-center justify-center">
+                  <Star className="w-4 h-4 text-secondary-accent" />
+                </div>
+                Highlights
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {(data.highlights || ['Guided Tours', 'Premium Accommodation', 'Meals Included', 'Free Cancellations', 'Local Transportation', 'Entry Fees']).map((h: string, i: number) => (
+                  <div key={i} className="flex items-center gap-3 text-text-muted group">
+                    <div className="w-2 h-2 bg-primary-accent rounded-full group-hover:scale-150 transition-transform" />
+                    <span className="group-hover:text-white transition-colors">{h}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
 
           {/* Sticky Booking Panel */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ position: 'sticky', top: 100 }}>
-              <Card sx={{ borderRadius: 3, boxShadow: '0 12px 32px rgba(29, 58, 95, 0.08)' }}>
-                <Box bgcolor="#f8fafc" p={3} textAlign="center" borderBottom="1px solid" borderColor="divider">
-                  <Typography variant="h4" fontWeight={800} color="primary.main">
-                    ${data.price} <Typography component="span" variant="body1" color="text.secondary">/ person</Typography>
-                  </Typography>
-                </Box>
+          <div className="lg:col-span-4">
+            <div className="sticky top-32 space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl backdrop-blur-xl"
+              >
+                <div className="bg-white/[0.03] p-8 border-b border-white/5 text-center">
+                  <p className="text-text-muted text-sm uppercase tracking-widest mb-2 font-bold">Total Price</p>
+                  <h3 className="text-5xl font-bold text-white">
+                    ${data.price}
+                    <span className="text-sm text-text-muted ml-2 font-normal">/ person</span>
+                  </h3>
+                </div>
 
-                <Box p={4} bgcolor="#fff">
+                <div className="p-8">
                   <AnimatePresence mode="wait">
-                    {/* Step 1: Traveler Details */}
                     {step === 'details' && (
-                      <motion.form key="details" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} onSubmit={handleDetailsSubmit}>
-                        <Typography variant="h5" color="secondary.main" mb={3} fontWeight={600}>Booking Details</Typography>
-                        <TextField fullWidth label="Full Name" required variant="outlined" sx={{ mb: 3 }} />
-                        <TextField fullWidth label="Email Address" type="email" required variant="outlined" sx={{ mb: 3 }} />
-                        <TextField fullWidth label="Travel Date" type="date" required InputLabelProps={{ shrink: true }} sx={{ mb: 3 }} />
-                        <Button variant="accent" type="submit" fullWidth sx={{ py: 1.5, fontSize: '1.1rem' }}>Proceed to Payment</Button>
+                      <motion.form 
+                        key="details"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        onSubmit={handleDetailsSubmit}
+                        className="space-y-6"
+                      >
+                        <h4 className="text-white font-bold mb-2">Traveler Information</h4>
+                        <div className="space-y-4">
+                          <input 
+                            type="text" 
+                            placeholder="Full Name" 
+                            required 
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-primary-accent transition-all"
+                          />
+                          <input 
+                            type="email" 
+                            placeholder="Email Address" 
+                            required 
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-primary-accent transition-all"
+                          />
+                          <div className="space-y-2">
+                            <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Departure Date</label>
+                            <input 
+                              type="date" 
+                              required 
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-primary-accent transition-all"
+                            />
+                          </div>
+                        </div>
+                        <Button variant="primary" type="submit" className="w-full py-4 rounded-2xl group shadow-2xl shadow-primary-accent/20">
+                          Confirm Details
+                          <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </Button>
                       </motion.form>
                     )}
 
-                    {/* Step 2: Payment */}
                     {step === 'payment' && (
-                      <motion.form key="payment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} onSubmit={handlePaymentSubmit}>
-                        <Typography variant="h5" color="secondary.main" mb={3} fontWeight={600}>Complete Payment</Typography>
-                        <FormControl component="fieldset" sx={{ mb: 3, width: '100%' }}>
-                          <RadioGroup value={paymentType} onChange={(e) => setPaymentType(e.target.value)}>
-                            <FormControlLabel value="card" control={<Radio color="primary" />} label="Credit / Debit Card" />
-                            <FormControlLabel value="paypal" control={<Radio color="primary" />} label="PayPal" />
-                          </RadioGroup>
-                        </FormControl>
+                      <motion.form 
+                        key="payment"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        onSubmit={handlePaymentSubmit}
+                        className="space-y-6"
+                      >
+                        <h4 className="text-white font-bold mb-4">Secure Payment</h4>
+                        <div className="flex gap-4 mb-6">
+                          {['card', 'paypal'].map((t) => (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => setPaymentType(t as any)}
+                              className={cn(
+                                "flex-1 py-3 rounded-2xl border transition-all text-sm font-bold flex items-center justify-center gap-2",
+                                paymentType === t 
+                                  ? "bg-secondary-accent/10 border-secondary-accent/30 text-secondary-accent" 
+                                  : "bg-white/5 border-white/5 text-text-muted hover:bg-white/10"
+                              )}
+                            >
+                              {t === 'card' ? <CardIcon className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full bg-blue-500" />}
+                              {t === 'card' ? 'Card' : 'PayPal'}
+                            </button>
+                          ))}
+                        </div>
 
-                        {paymentStrategy.getFields().length > 0 ? (
-                          <Box mb={3}>
-                            {paymentStrategy.getFields().map(field => (
-                              <TextField
-                                key={field.name}
-                                fullWidth
-                                name={field.name}
-                                label={field.label}
-                                required={field.required}
-                                type={field.type}
-                                sx={{ mb: 2 }}
+                        {paymentType === 'card' && (
+                          <div className="space-y-4">
+                            <input 
+                              type="text" 
+                              placeholder="Card Number" 
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-secondary-accent transition-all"
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                              <input 
+                                type="text" 
+                                placeholder="MM/YY" 
+                                className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-secondary-accent transition-all"
                               />
-                            ))}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary" mb={3}>
-                            You will be redirected to PayPal to complete your secure payment.
-                          </Typography>
+                              <input 
+                                type="text" 
+                                placeholder="CVV" 
+                                className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-secondary-accent transition-all"
+                              />
+                            </div>
+                          </div>
                         )}
-                        <Button variant="accent" type="submit" fullWidth sx={{ py: 1.5, fontSize: '1.1rem' }}>
-                          {paymentStrategy.getSubmitButtonLabel(data.price)}
+
+                        <Button 
+                          variant="accent" 
+                          type="submit" 
+                          disabled={isLoading}
+                          className="w-full py-4 rounded-2xl shadow-2xl shadow-secondary-accent/20"
+                        >
+                          {isLoading ? "Processing..." : `Pay $${data.price}`}
                         </Button>
-                        <Button variant="text" fullWidth onClick={() => setStep(bookingService.reset())} sx={{ mt: 1, color: 'text.secondary' }}>
-                          Back
-                        </Button>
+                        <button 
+                          type="button" 
+                          onClick={() => setStep('details')}
+                          className="w-full text-center text-text-muted text-xs hover:text-white transition-colors"
+                        >
+                          Edit traveler details
+                        </button>
                       </motion.form>
                     )}
 
-                    {/* Step 3: Success */}
                     {step === 'success' && (
-                      <motion.div key="success" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ textAlign: 'center' }}>
-                        <Box sx={{ width: 64, height: 64, bgcolor: 'primary.main', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 3, fontSize: '2rem' }}>
-                          ✓
-                        </Box>
-                        <Typography variant="h4" color="secondary.main" mb={2}>Booking Confirmed!</Typography>
-                        <Typography variant="body1" color="text.secondary" mb={4}>
-                          Your adventure is secured. We've sent a confirmation email to your inbox.
-                        </Typography>
-                        <Button variant="primary" fullWidth onClick={() => navigate('/')}>Return to Home</Button>
+                      <motion.div 
+                        key="success"
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="text-center py-8"
+                      >
+                        <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <CheckCircle2 className="w-10 h-10 text-green-400" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Booking Confirmed!</h3>
+                        <p className="text-text-muted text-sm mb-8 leading-relaxed">
+                          Your adventure is secured. We've sent your itinerary and confirmation to your email.
+                        </p>
+                        <Button variant="primary" className="w-full rounded-2xl" onClick={() => navigate('/')}>
+                          Return Home
+                        </Button>
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </Box>
-              </Card>
-            </Box>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+                </div>
+              </motion.div>
+
+              <div className="p-6 bg-white/5 border border-white/10 rounded-3xl flex items-start gap-4">
+                <ShieldCheck className="w-6 h-6 text-primary-accent shrink-0" />
+                <div>
+                  <p className="text-white text-sm font-bold mb-1">Secure Transaction</p>
+                  <p className="text-text-muted text-xs">Your data is protected by industry-standard encryption.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

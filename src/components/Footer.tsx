@@ -1,91 +1,136 @@
 import React from "react";
-import { FaInstagram, FaTwitter, FaFacebook, FaLinkedin, FaArrowUp } from "react-icons/fa";
-import { Box, Typography, Container, IconButton } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import { motion } from "framer-motion";
+import { 
+  FaInstagram, 
+  FaTwitter, 
+  FaFacebook, 
+  FaLinkedin 
+} from "react-icons/fa";
+import {
+  ArrowUp, 
+  Compass, 
+  Mail, 
+  Send 
+} from "lucide-react";
 import { FooterService } from '../services/FooterService';
+import Button from "./Button";
 
 const footerService = new FooterService();
 
-const Footer: React.FC = () => (
-  <Box
-    component="footer"
-    sx={{
-      bgcolor: 'secondary.main',
-      color: '#fff',
-      py: 6,
-      mt: 'auto',
-      position: 'relative',
-    }}
-  >
-    <Container maxWidth="lg">
-      <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="center">
+const Footer: React.FC = () => {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-        <Box display="flex" alignItems="center" gap={1} mb={{ xs: 3, md: 0 }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <Typography 
-            variant="h5" 
-            fontWeight="700" 
-            letterSpacing={1} 
-            fontFamily="Poppins"
-            className="navbar-brand"
-          >
-            Token of Memento
-          </Typography>
-        </Box>
+  return (
+    <footer className="relative bg-background pt-24 pb-12 border-t border-white/5 overflow-hidden">
+      {/* Background Blobs */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-accent/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-secondary-accent/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
 
-        <Box display="flex" gap={3} mb={{ xs: 3, md: 0 }}>
-          {footerService.getLinks().map(link => (
-            <Typography key={link.label} variant="body2" sx={{ cursor: link.path ? 'pointer' : 'default', transition: '0.3s', '&:hover': { color: link.path ? 'accent.main' : 'inherit' } }}>
-              {link.label}
-            </Typography>
-          ))}
-        </Box>
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          {/* Brand Column */}
+          <div className="space-y-6">
+            <RouterLink to="/" className="flex items-center gap-2 group w-fit">
+              <div className="w-10 h-10 bg-primary-accent rounded-xl flex items-center justify-center shadow-lg shadow-primary-accent/20">
+                <Compass className="text-background w-6 h-6" />
+              </div>
+              <span className="text-2xl font-bold font-poppins tracking-tight text-white">
+                Adventurers
+              </span>
+            </RouterLink>
+            <p className="text-text-muted leading-relaxed">
+              Crafting unforgettable journeys for the modern explorer. Discover the world's most hidden gems with our curated travel experiences.
+            </p>
+            <div className="flex items-center gap-4">
+              {[FaInstagram, FaTwitter, FaFacebook, FaLinkedin].map((Icon, i) => (
+                <motion.a
+                  key={i}
+                  href="#"
+                  whileHover={{ y: -4, scale: 1.1 }}
+                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-muted hover:text-primary-accent hover:bg-white/10 transition-colors border border-white/10"
+                >
+                  <Icon className="w-5 h-5" />
+                </motion.a>
+              ))}
+            </div>
+          </div>
 
-        <Box display="flex" gap={2}>
-          {footerService.getSocialLinks().map((social) => {
-            const icon = (() => {
-              switch (social.icon) {
-                case 'twitter':
-                  return <FaTwitter style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
-                case 'facebook':
-                  return <FaFacebook style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
-                case 'linkedin':
-                  return <FaLinkedin style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
-                case 'instagram':
-                default:
-                  return <FaInstagram style={{ cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }} className="hover-accent" />;
-              }
-            })();
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Quick Links</h4>
+            <ul className="space-y-4">
+              {footerService.getLinks().map((link) => (
+                <li key={link.label}>
+                  <RouterLink
+                    to={link.path || "/"}
+                    className="text-text-muted hover:text-primary-accent transition-colors flex items-center group"
+                  >
+                    <span className="w-0 group-hover:w-2 h-0.5 bg-primary-accent mr-0 group-hover:mr-2 transition-all" />
+                    {link.label}
+                  </RouterLink>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            return <Box key={social.label}>{icon}</Box>;
-          })}
-        </Box>
-      </Box>
+          {/* Contact Info */}
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Contact Us</h4>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3 text-text-muted">
+                <Mail className="w-5 h-5 text-primary-accent shrink-0" />
+                <span>hello@adventurers.com</span>
+              </li>
+              <li className="text-text-muted leading-relaxed">
+                123 Travel Street, Adventure Bay,<br />
+                World Explorer HQ
+              </li>
+            </ul>
+          </div>
 
-      <Typography variant="body2" color="rgba(255,255,255,0.7)" align="center" sx={{ mt: 4, pt: 4, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-        &copy; {new Date().getFullYear()} Token of Memento. All rights reserved.
-      </Typography>
+          {/* Newsletter */}
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Newsletter</h4>
+            <p className="text-text-muted mb-6 text-sm">
+              Get the latest updates and exclusive travel deals.
+            </p>
+            <form className="space-y-3">
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:border-primary-accent transition-colors"
+                />
+                <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary-accent rounded-lg flex items-center justify-center text-background hover:scale-110 transition-transform">
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
 
-      <IconButton
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        sx={{
-          position: 'absolute',
-          right: 24,
-          bottom: 24,
-          bgcolor: 'rgba(255,255,255,0.15)',
-          color: '#fff',
-          '&:hover': { bgcolor: 'accent.main' },
-        }}
-      >
-        <FaArrowUp />
-      </IconButton>
-    </Container>
-    <style>{`
-      .hover-accent:hover { color: #FF6B35 !important; }
-    `}</style>
-  </Box>
-);
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-text-muted text-sm">
+            &copy; {new Date().getFullYear()} Adventurers. All rights reserved.
+          </p>
+          <div className="flex items-center gap-8">
+            <a href="#" className="text-text-muted hover:text-white text-sm transition-colors">Privacy Policy</a>
+            <a href="#" className="text-text-muted hover:text-white text-sm transition-colors">Terms of Service</a>
+            <button
+              onClick={scrollToTop}
+              className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-white hover:bg-primary-accent hover:text-background transition-all border border-white/10 group"
+            >
+              <ArrowUp className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
 
-export default Footer; 
+export default Footer;

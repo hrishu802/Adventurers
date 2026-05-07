@@ -1,74 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap');
+@import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@theme {
+  --color-background: #0f172a;
+  --color-primary-accent: #14b8a6;
+  --color-secondary-accent: #f59e0b;
+  --color-text-primary: #f8fafc;
+  --color-text-muted: #94a3b8;
+  
+  --font-inter: "Inter", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
 
-:root {
-  --primary: #2E8B57;
-  --secondary: #1E3A5F;
-  --accent: #FF6B35;
-  --bg: #F5F7F6;
-  --surface: #FFFFFF;
-  --text-primary: #1A1A1A;
-  --text-secondary: #6B7280;
-  --border: #E5E7EB;
-  --transition: all 0.3s ease;
+  --radius-2xl: 1rem;
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  color: var(--text-primary);
-  background-color: var(--bg);
-  line-height: 1.6;
+@layer base {
+  body {
+    @apply bg-background text-text-primary font-inter antialiased overflow-x-hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins font-bold;
+  }
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
-  color: var(--text-primary);
+@layer utilities {
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-lg border border-white/10;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-accent to-secondary-accent;
+  }
+
+  .section-padding {
+    @apply py-20 px-6 md:px-12 lg:px-24;
+  }
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-  transition: var(--transition);
+/* Custom Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
 }
 
-.section {
-  padding: 64px 0;
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
-
-.section-padding {
-  padding: 32px 0;
-}
-
-.hover-lift {
-  transition: var(--transition);
-}
-
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-}
-
-.navbar-brand {
-  color: #ffffff !important;
-}
- 

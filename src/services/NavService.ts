@@ -7,6 +7,7 @@ export class NavService {
   getPrimaryItems(): NavItem[] {
     return [
       { name: 'Home', path: '/' },
+      { name: 'Packages', path: '/packages' },
       { name: 'About', path: '/about' },
       { name: 'Services', path: '/services' },
       { name: 'Blog', path: '/blog' },

@@ -78,7 +78,7 @@ export const destinationRecords: Destination[] = [
     title: 'Eiffel Tower Tour',
     price: 99,
     rating: 4.7,
-    image: 'https://images.unsplash.com/photo-1502602859462-226d1da32407?auto=format&fit=crop&w=800',
+    image: 'https://images.unsplash.com/photo-1431274172761-fca41d930114?auto=format&fit=crop&w=800',
     description: 'Skip the lines and enjoy a guided tour of Paris’s most famous landmark.',
     duration: '2 Hours',
     highlights: ['Top floor access', 'City views', 'Guide']
@@ -90,7 +90,7 @@ export const destinationRecords: Destination[] = [
     title: 'Romantic Paris',
     price: 1399,
     rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1502602859462-226d1da32407?auto=format&fit=crop&w=800',
+    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=800',
     description: 'A romantic getaway with luxury hotels, candlelit dinners, and Seine river cruises.',
     duration: '4 Days',
     highlights: ['Seine cruise', 'Louvre VIP', 'Wine tasting']
@@ -102,7 +102,7 @@ export const destinationRecords: Destination[] = [
     title: 'Broadway Show',
     price: 189,
     rating: 4.9,
-    image: 'https://images.openai.com/static-rsc-4/HU4JP3p_ynoU-VEWlepN3aapEbFC-HbXHAkalcyLclRCzguBJzQZ3C4hTJ0deB5A28g2iz_sNkrXZRhuy6x3bN7LNd1c-s8MtLC0HJqPc9-IKA0hvlZ85A4ONyKq6RYCSfzt7Rv0HB2fa_cROSZsNhaJAtmdW7xJWNRSGdd7nzLLGnl6B804c6fV0YSC5E2j?purpose=fullsize',
+    image: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800',
     description: 'Experience world-class theater with premium seating and a guided city walk.',
     duration: '3 Hours'
   },
@@ -113,7 +113,7 @@ export const destinationRecords: Destination[] = [
     title: 'NYC Explorer',
     price: 1499,
     rating: 4.8,
-    image: 'https://images.openai.com/static-rsc-4/HU4JP3p_ynoU-VEWlepN3aapEbFC-HbXHAkalcyLclRCzguBJzQZ3C4hTJ0deB5A28g2iz_sNkrXZRhuy6x3bN7LNd1c-s8MtLC0HJqPc9-IKA0hvlZ85A4ONyKq6RYCSfzt7Rv0HB2fa_cROSZsNhaJAtmdW7xJWNRSGdd7nzLLGnl6B804c6fV0YSC5E2j?purpose=fullsize',
+    image: 'https://images.unsplash.com/photo-1534430480872-3498386e7a55?auto=format&fit=crop&w=800',
     description: 'A full New York itinerary with landmark visits, dining, and sightseeing tours.',
     duration: '6 Days'
   },

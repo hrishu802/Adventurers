@@ -1,75 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Grid, Typography, Avatar, Paper, Tab, Tabs, Chip, Divider, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, CircularProgress } from '@mui/material';
-import { motion } from 'framer-motion';
-import EditIcon from '@mui/icons-material/Edit';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import SettingsIcon from '@mui/icons-material/Settings';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import CardTravelIcon from '@mui/icons-material/CardTravel';
-import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  User, 
+  MapPin, 
+  Calendar, 
+  Settings, 
+  Heart, 
+  Briefcase, 
+  Edit3, 
+  LogOut, 
+  Camera,
+  Globe,
+  Star,
+  CheckCircle2,
+  Trash2,
+  X
+} from 'lucide-react';
+import { cn } from '../utils/cn';
+import Button from '../components/Button';
 import { userService, UserData } from '../services/UserService';
 
-// Mock Data
-const MOCK_USER = {
-  name: "Alex Wanderlust",
-  email: "alex.wanderlust@example.com",
-  location: "San Francisco, CA",
-  joinedDate: "Member since Jan 2024",
-  avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200",
-  coverImage: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200",
-  stats: {
-    trips: 12,
-    countries: 8,
-    reviews: 24
-  }
-};
-
-const MOCK_BOOKINGS = [
-  { id: 1, title: 'Bali Tropical Escape', date: 'Oct 15 - Oct 25, 2025', status: 'Upcoming', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400' },
-  { id: 2, title: 'Swiss Alps Adventure', date: 'Dec 10 - Dec 20, 2025', status: 'Pending', image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=400' },
-  { id: 3, title: 'Kyoto Cultural Tour', date: 'Mar 05 - Mar 15, 2024', status: 'Completed', image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=400' }
-];
-
-const MOCK_SAVED = [
-  { id: 1, title: 'Santorini Sunset Cruise', price: '$150', image: 'https://images.unsplash.com/photo-1516483638261-f4082823b185?auto=format&fit=crop&w=400' },
-  { id: 2, title: 'Northern Lights Tour', price: '$850', image: 'https://images.unsplash.com/photo-1531366936337-77b5a414e21a?auto=format&fit=crop&w=400' }
-];
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`profile-tabpanel-${index}`}
-      aria-labelledby={`profile-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ py: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
 const Profile: React.FC = () => {
-  const [tabValue, setTabValue] = useState(0);
+  const [activeTab, setActiveTab] = useState<'bookings' | 'saved' | 'settings'>('bookings');
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [updateError, setUpdateError] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     name: '',
     location: '',
@@ -77,6 +33,7 @@ const Profile: React.FC = () => {
     avatar: '',
     coverImage: ''
   });
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,7 +47,6 @@ const Profile: React.FC = () => {
         const data = await userService.getProfile(userId);
         setUser(data);
       } catch (error) {
-        console.error("Failed to load user profile", error);
         navigate('/login');
       } finally {
         setLoading(false);
@@ -99,294 +55,341 @@ const Profile: React.FC = () => {
     fetchUser();
   }, [navigate]);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  const handleOpenEditModal = () => {
-    if (user) {
-      setEditForm({
-        name: user.name || '',
-        location: user.location || '',
-        bio: user.bio || '',
-        avatar: user.avatar || '',
-        coverImage: user.coverImage || ''
-      });
-      setIsEditModalOpen(true);
-      setUpdateError(null);
-    }
-  };
-
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setEditForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleUpdateProfile = async () => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) return;
-
-    if (!editForm.name.trim()) {
-      setUpdateError("Name is required");
-      return;
-    }
-
-    setUpdateLoading(true);
-    setUpdateError(null);
-
-    try {
-      const updatedData = await userService.updateProfile(userId, editForm);
-      setUser(updatedData);
-      handleCloseEditModal();
-    } catch (error: any) {
-      setUpdateError(error.message || "Failed to update profile");
-    } finally {
-      setUpdateLoading(false);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    const userId = localStorage.getItem('userId');
-    if (userId && window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      try {
-        await userService.deleteProfile(userId);
-        navigate('/');
-      } catch (error) {
-        console.error("Failed to delete account", error);
-      }
-    }
+  const handleLogout = () => {
+    userService.logout();
+    navigate('/login');
   };
 
   if (loading) {
-    return <Box minHeight="100vh" display="flex" justifyContent="center" alignItems="center"><Typography>Loading Profile...</Typography></Box>;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   if (!user) return null;
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 8 }}>
+    <div className="min-h-screen bg-background pb-20">
       {/* Cover Image */}
-      <Box
-        sx={{
-          height: { xs: 200, md: 350 },
-          width: '100%',
-          backgroundImage: `url(${user.coverImage || MOCK_USER.coverImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative'
-        }}
-      >
-        <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.4))' }} />
-        <IconButton 
-          onClick={handleOpenEditModal}
-          sx={{ position: 'absolute', bottom: 16, right: 16, bgcolor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}
+      <div className="relative h-[300px] md:h-[400px] overflow-hidden">
+        <img 
+          src={user.coverImage || "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200"} 
+          className="w-full h-full object-cover"
+          alt="Cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+        <button 
+          onClick={() => setIsEditModalOpen(true)}
+          className="absolute bottom-8 right-8 p-3 bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl text-white hover:bg-white/20 transition-all"
         >
-          <EditIcon />
-        </IconButton>
-      </Box>
+          <Camera className="w-5 h-5" />
+        </button>
+      </div>
 
-      <Container maxWidth="lg" sx={{ mt: { xs: -6, md: -10 }, position: 'relative', zIndex: 2 }}>
-        <Grid container spacing={4}>
+      <div className="max-w-7xl mx-auto px-6 -mt-32 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Left Sidebar - Profile Info */}
-          <Grid item xs={12} md={4}>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5 }}>
-              <Paper elevation={0} sx={{ p: 4, borderRadius: 4, boxShadow: '0 8px 32px rgba(0,0,0,0.06)', textAlign: 'center', bgcolor: '#fff' }}>
-                <Box sx={{ position: 'relative', display: 'inline-block' }}>
-                  <Avatar src={user.avatar || MOCK_USER.avatar} sx={{ width: 150, height: 150, border: '6px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                  <IconButton 
-                    onClick={handleOpenEditModal}
-                    sx={{ position: 'absolute', bottom: 4, right: 4, bgcolor: 'secondary.main', color: '#fff', width: 36, height: 36, '&:hover': { bgcolor: 'secondary.dark' } }}
-                  >
-                    <EditIcon sx={{ fontSize: 20 }} />
-                  </IconButton>
-                </Box>
-
-                <Typography variant="h5" fontWeight={700} mt={2} color="secondary.main">{user.name}</Typography>
-                <Typography variant="body2" color="text.secondary" mb={2}>{user.email}</Typography>
-
-                <Box display="flex" justifyContent="center" alignItems="center" gap={1} mb={1} color="text.secondary">
-                  <LocationOnIcon fontSize="small" />
-                  <Typography variant="body2">{user.location || MOCK_USER.location}</Typography>
-                </Box>
-                <Box display="flex" justifyContent="center" alignItems="center" gap={1} mb={2} color="text.secondary">
-                  <CalendarMonthIcon fontSize="small" />
-                  <Typography variant="body2">{MOCK_USER.joinedDate}</Typography>
-                </Box>
-
-                <Typography variant="body2" color="text.secondary" px={2} mb={3} sx={{ fontStyle: 'italic' }}>
-                  "{user.bio || 'No bio yet.'}"
-                </Typography>
-
-                <Divider sx={{ my: 3 }} />
-
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <Typography variant="h6" fontWeight={700} color="secondary.main">{user.stats?.trips || MOCK_USER.stats.trips}</Typography>
-                    <Typography variant="caption" color="text.secondary">Trips</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography variant="h6" fontWeight={700} color="secondary.main">{user.stats?.countries || MOCK_USER.stats.countries}</Typography>
-                    <Typography variant="caption" color="text.secondary">Countries</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography variant="h6" fontWeight={700} color="secondary.main">{user.stats?.reviews || MOCK_USER.stats.reviews}</Typography>
-                    <Typography variant="caption" color="text.secondary">Reviews</Typography>
-                  </Grid>
-                </Grid>
-
-                <Button 
-                  variant="accent" 
-                  fullWidth 
-                  sx={{ mt: 4, py: 1.5 }}
-                  onClick={handleOpenEditModal}
+          {/* Sidebar */}
+          <div className="lg:col-span-4 space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 text-center shadow-2xl"
+            >
+              <div className="relative inline-block mb-6">
+                <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden border-4 border-background shadow-2xl">
+                  <img 
+                    src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200"} 
+                    className="w-full h-full object-cover"
+                    alt="Avatar"
+                  />
+                </div>
+                <button 
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="absolute -bottom-2 -right-2 p-2 bg-primary-accent text-background rounded-xl shadow-lg border-4 border-background"
                 >
-                  Edit Profile
-                </Button>
-              </Paper>
+                  <Edit3 className="w-4 h-4" />
+                </button>
+              </div>
+
+              <h2 className="text-2xl font-bold text-white mb-1">{user.name}</h2>
+              <p className="text-text-muted text-sm mb-6">{user.email}</p>
+
+              <div className="flex flex-wrap justify-center gap-4 mb-8">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-text-muted bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                  <MapPin className="w-3.5 h-3.5 text-primary-accent" />
+                  {user.location || "Earth Explorer"}
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-medium text-text-muted bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                  <Calendar className="w-3.5 h-3.5 text-secondary-accent" />
+                  Joined 2024
+                </div>
+              </div>
+
+              <p className="text-text-muted text-sm italic mb-8 px-4 leading-relaxed">
+                "{user.bio || "No bio yet. Start your story today!"}"
+              </p>
+
+              <div className="grid grid-cols-3 gap-4 py-6 border-y border-white/5">
+                <div>
+                  <p className="text-lg font-bold text-white">12</p>
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">Trips</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-white">8</p>
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">Countries</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-white">24</p>
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">Reviews</p>
+                </div>
+              </div>
+
+              <Button 
+                variant="primary" 
+                className="w-full mt-8 rounded-2xl"
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                Edit Profile
+              </Button>
             </motion.div>
-          </Grid>
 
-          {/* Right Area - Tabs & Content */}
-          <Grid item xs={12} md={8}>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }}>
-              <Paper elevation={0} sx={{ borderRadius: 4, boxShadow: '0 8px 32px rgba(0,0,0,0.06)', bgcolor: '#fff', overflow: 'hidden' }}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: '#fafafa' }}>
-                  <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" indicatorColor="primary" textColor="primary">
-                    <Tab icon={<CardTravelIcon />} label="My Bookings" iconPosition="start" sx={{ fontWeight: 600, py: 3 }} />
-                    <Tab icon={<FavoriteIcon />} label="Saved" iconPosition="start" sx={{ fontWeight: 600, py: 3 }} />
-                    <Tab icon={<SettingsIcon />} label="Settings" iconPosition="start" sx={{ fontWeight: 600, py: 3 }} />
-                  </Tabs>
-                </Box>
-
-                <Box px={4} pb={4}>
-                  {/* Bookings Tab */}
-                  <CustomTabPanel value={tabValue} index={0}>
-                    <Typography variant="h6" fontWeight={700} color="secondary.main" mb={3}>Upcoming & Past Trips</Typography>
-                    <Grid container spacing={3}>
-                      {MOCK_BOOKINGS.map((booking, index) => (
-                        <Grid item xs={12} key={booking.id}>
-                          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}>
-                            <Box sx={{ display: 'flex', gap: 3, p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider', transition: 'all 0.3s ease', '&:hover': { borderColor: 'accent.main', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' } }}>
-                              <Box sx={{ width: 120, height: 100, borderRadius: 2, overflow: 'hidden', flexShrink: 0 }}>
-                                <img src={booking.image} alt={booking.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              </Box>
-                              <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flexGrow: 1 }}>
-                                <Typography variant="h6" fontWeight={600} color="secondary.main">{booking.title}</Typography>
-                                <Typography variant="body2" color="text.secondary" mb={1}>{booking.date}</Typography>
-                                <Box>
-                                  <Chip 
-                                    label={booking.status} 
-                                    size="small" 
-                                    sx={{ 
-                                      bgcolor: booking.status === 'Completed' ? '#e8f5e9' : booking.status === 'Upcoming' ? '#e3f2fd' : '#fff3e0',
-                                      color: booking.status === 'Completed' ? '#2e7d32' : booking.status === 'Upcoming' ? '#1565c0' : '#ef6c00',
-                                      fontWeight: 600
-                                    }} 
-                                  />
-                                </Box>
-                              </Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Button variant="outlined" sx={{ whiteSpace: 'nowrap' }}>View Details</Button>
-                              </Box>
-                            </Box>
-                          </motion.div>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </CustomTabPanel>
-
-                  {/* Saved Destinations Tab */}
-                  <CustomTabPanel value={tabValue} index={1}>
-                    <Typography variant="h6" fontWeight={700} color="secondary.main" mb={3}>Your Wishlist</Typography>
-                    <Grid container spacing={3}>
-                      {MOCK_SAVED.map((item, index) => (
-                        <Grid item xs={12} sm={6} key={item.id}>
-                          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.1 }}>
-                            <Box sx={{ position: 'relative', borderRadius: 3, overflow: 'hidden', height: 200, cursor: 'pointer', '&:hover img': { transform: 'scale(1.05)' } }}>
-                              <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
-                              <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)', p: 2, color: '#fff' }}>
-                                <Typography variant="h6" fontWeight={600}>{item.title}</Typography>
-                                <Typography variant="body2" sx={{ color: 'accent.main', fontWeight: 700 }}>Starting from {item.price}</Typography>
-                              </Box>
-                              <IconButton sx={{ position: 'absolute', top: 10, right: 10, color: 'error.main', bgcolor: 'rgba(255,255,255,0.8)', '&:hover': { bgcolor: '#fff' } }}>
-                                <FavoriteIcon />
-                              </IconButton>
-                            </Box>
-                          </motion.div>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </CustomTabPanel>
-
-                  {/* Settings Tab */}
-                  <CustomTabPanel value={tabValue} index={2}>
-                     <Typography variant="h6" fontWeight={700} color="secondary.main" mb={3}>Account Settings</Typography>
-                     <Typography variant="body1" color="text.secondary" mb={4}>Manage your account preferences and settings here.</Typography>
-                     <Button variant="outlined" sx={{ mr: 2 }}>Change Password</Button>
-                     <Button 
-                       variant="outlined" 
-                       sx={{ mr: 2, color: 'error.main', borderColor: 'error.main', '&:hover': { bgcolor: 'error.50', borderColor: 'error.main' } }} 
-                       onClick={handleDeleteAccount}
-                     >
-                       Delete Account
-                     </Button>
-                     <Button 
-                       variant="accent" 
-                       sx={{ bgcolor: 'secondary.main', '&:hover': { bgcolor: 'secondary.dark' } }} 
-                       onClick={() => {
-                         userService.logout();
-                         navigate('/login');
-                       }}
-                     >
-                       Logout
-                     </Button>
-                  </CustomTabPanel>
-                </Box>
-              </Paper>
+            {/* Achievement / Stats Card */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6"
+            >
+              <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                <Star className="w-4 h-4 text-secondary-accent" />
+                Badges
+              </h3>
+              <div className="flex gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-accent/10 flex items-center justify-center text-primary-accent" title="First Trip">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-secondary-accent/10 flex items-center justify-center text-secondary-accent" title="Reviewer">
+                  <Edit3 className="w-5 h-5" />
+                </div>
+              </div>
             </motion.div>
-          </Grid>
-        </Grid>
-      </Container>
-      <Dialog open={isEditModalOpen} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 700 }}>Edit Your Profile</DialogTitle>
-        <DialogContent dividers>
-          {updateError && <Alert severity="error" sx={{ mb: 2 }}>{updateError}</Alert>}
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <TextField fullWidth label="Full Name" name="name" value={editForm.name} onChange={handleInputChange} margin="normal" />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth label="Location" name="location" value={editForm.location} onChange={handleInputChange} margin="normal" />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth label="Bio" name="bio" value={editForm.bio} onChange={handleInputChange} margin="normal" multiline rows={3} />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth label="Avatar URL" name="avatar" value={editForm.avatar} onChange={handleInputChange} margin="normal" />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth label="Cover Image URL" name="coverImage" value={editForm.coverImage} onChange={handleInputChange} margin="normal" />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={handleCloseEditModal} color="inherit">Cancel</Button>
-          <Button 
-            onClick={handleUpdateProfile} 
-            variant="accent" 
-            disabled={updateLoading}
-            sx={{ minWidth: 120 }}
-          >
-            {updateLoading ? <CircularProgress size={24} color="inherit" /> : 'Save Changes'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-8 space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl"
+            >
+              {/* Tabs */}
+              <div className="flex border-b border-white/5 bg-white/[0.02]">
+                {[
+                  { id: 'bookings', label: 'My Bookings', icon: Briefcase },
+                  { id: 'saved', label: 'Wishlist', icon: Heart },
+                  { id: 'settings', label: 'Settings', icon: Settings },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-5 text-sm font-bold transition-all relative group",
+                      activeTab === tab.id ? "text-primary-accent" : "text-text-muted hover:text-white"
+                    )}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                    {activeTab === tab.id && (
+                      <motion.div 
+                        layoutId="activeTab" 
+                        className="absolute bottom-0 left-0 right-0 h-1 bg-primary-accent rounded-full" 
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <div className="p-8">
+                <AnimatePresence mode="wait">
+                  {activeTab === 'bookings' && (
+                    <motion.div
+                      key="bookings"
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="space-y-6"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xl font-bold text-white">Upcoming Journeys</h3>
+                        <span className="text-xs text-text-muted bg-white/5 px-3 py-1 rounded-full border border-white/10">3 Total</span>
+                      </div>
+
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="group flex items-center gap-6 p-4 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-primary-accent/30 hover:bg-white/5 transition-all">
+                          <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
+                            <img 
+                              src={`https://images.unsplash.com/photo-${i === 1 ? '1537996194471-e657df975ab4' : i === 2 ? '1530122037265-a5f1f91d3b99' : '1493976040374-85c8e12f0c0e'}?auto=format&fit=crop&w=400`} 
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              alt="Trip"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-white font-bold text-lg mb-1 truncate">
+                              {i === 1 ? 'Bali Tropical Escape' : i === 2 ? 'Swiss Alps Adventure' : 'Kyoto Cultural Tour'}
+                            </h4>
+                            <p className="text-text-muted text-sm mb-3">Oct 15 - Oct 25, 2025</p>
+                            <div className="flex items-center gap-3">
+                              <span className={cn(
+                                "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                                i === 3 ? "bg-green-500/10 text-green-400" : "bg-primary-accent/10 text-primary-accent"
+                              )}>
+                                {i === 3 ? 'Completed' : 'Confirmed'}
+                              </span>
+                            </div>
+                          </div>
+                          <Button variant="outlined" size="sm" className="hidden sm:flex rounded-xl">Details</Button>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+
+                  {activeTab === 'saved' && (
+                    <motion.div
+                      key="saved"
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+                    >
+                      {[1, 2].map((i) => (
+                        <div key={i} className="group relative rounded-[2rem] overflow-hidden border border-white/10 aspect-square">
+                          <img 
+                            src={i === 1 ? 'https://images.unsplash.com/photo-1516483638261-f4082823b185' : 'https://images.unsplash.com/photo-1531366936337-77b5a414e21a'} 
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            alt="Saved"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                          <div className="absolute bottom-6 left-6 right-6">
+                            <h4 className="text-white font-bold text-lg">{i === 1 ? 'Santorini Sunset' : 'Northern Lights'}</h4>
+                            <p className="text-primary-accent font-bold">$150</p>
+                          </div>
+                          <button className="absolute top-4 right-4 p-2.5 bg-red-500 text-white rounded-xl shadow-lg">
+                            <Heart className="w-4 h-4 fill-white" />
+                          </button>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+
+                  {activeTab === 'settings' && (
+                    <motion.div
+                      key="settings"
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="space-y-8"
+                    >
+                      <div>
+                        <h3 className="text-white font-bold mb-4">Account Preferences</h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                            <div>
+                              <p className="text-white font-medium">Email Notifications</p>
+                              <p className="text-text-muted text-xs">Receive updates about your bookings</p>
+                            </div>
+                            <div className="w-12 h-6 bg-primary-accent rounded-full relative p-1 cursor-pointer">
+                              <div className="w-4 h-4 bg-background rounded-full absolute right-1" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-8 border-t border-white/5 space-y-4">
+                        <h3 className="text-red-400 font-bold mb-4">Danger Zone</h3>
+                        <div className="flex flex-wrap gap-4">
+                          <Button variant="outlined" className="border-red-500/50 text-red-400 hover:bg-red-500/10 rounded-xl">
+                            Delete Account
+                          </Button>
+                          <Button variant="ghost" onClick={handleLogout} className="text-text-muted rounded-xl gap-2">
+                            <LogOut className="w-4 h-4" />
+                            Log Out
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Modal (Simplified for UI Demo) */}
+      <AnimatePresence>
+        {isEditModalOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsEditModalOpen(false)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm" 
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-lg bg-background border border-white/10 rounded-[2.5rem] shadow-2xl p-8 overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-accent/10 blur-3xl -translate-y-1/2 translate-x-1/2" />
+              
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-bold text-white">Edit Profile</h3>
+                <button onClick={() => setIsEditModalOpen(false)} className="p-2 text-text-muted hover:text-white transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Full Name</label>
+                  <input 
+                    type="text" 
+                    defaultValue={user.name}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-primary-accent transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Location</label>
+                  <input 
+                    type="text" 
+                    defaultValue={user.location || ""}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-primary-accent transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-muted uppercase tracking-wider ml-1">Bio</label>
+                  <textarea 
+                    defaultValue={user.bio || ""}
+                    rows={3}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-primary-accent transition-all resize-none"
+                  />
+                </div>
+                <div className="pt-4 flex gap-4">
+                  <Button variant="primary" className="flex-1 rounded-2xl">Save Changes</Button>
+                  <Button variant="ghost" onClick={() => setIsEditModalOpen(false)} className="flex-1 rounded-2xl">Cancel</Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 

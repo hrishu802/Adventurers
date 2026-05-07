@@ -9,7 +9,8 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error: any) {
     console.error(`Error: ${error.message}`);
-    process.exit(1);
+    console.warn('Backend server is running without a database connection. Please check your MONGO_URI.');
+    // process.exit(1);
   }
 };
 

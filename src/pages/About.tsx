@@ -1,72 +1,89 @@
-import { Container, Typography, Box, Grid } from '@mui/material';
+import React from 'react';
 import { motion } from 'framer-motion';
+import { Compass, Globe, Shield, Users } from 'lucide-react';
 import { PageContentService } from '../services/PageContentService';
 
 const contentService = new PageContentService();
 
 const About: React.FC = () => {
   const aboutSections = contentService.getAboutSections();
+  
+  const icons = [Compass, Globe, Shield, Users];
+
   return (
-    <Container>
-      <Box sx={{ py: 8 }}>
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <Typography variant="h2" component="h1" className="section-title" sx={{ fontFamily: 'Montserrat, Poppins, sans-serif', color: 'var(--primary-color)', fontWeight: 700 }}>
-            About Us
-          </Typography>
-        </motion.div>
-        <Grid container spacing={6}>
-          {aboutSections.map((section, index) => (
-            <Grid item xs={12} md={6} key={section.title}>
-              <motion.div
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 + index * 0.2 }}
-              >
-                <Box
-                  sx={{
-                    p: 4,
-                    borderRadius: 3,
-                    boxShadow: '0 10px 24px rgba(20,58,82,0.10)',
-                    backgroundColor: 'var(--surface-color)',
-                    border: '1px solid #e3e9f1',
-                    height: '100%',
-                    transition: 'var(--transition)',
-                    '&:hover': {
-                      transform: 'translateY(-5px) scale(1.02)',
-                      boxShadow: '0 15px 30px rgba(20,58,82,0.15)',
-                      borderColor: 'var(--secondary-color)',
-                    },
-                  }}
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-accent/5 blur-[120px] rounded-full" />
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-1 bg-primary-accent/10 border border-primary-accent/20 rounded-full text-primary-accent text-sm font-bold uppercase tracking-widest mb-6">
+              Our Story
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold font-poppins text-white mb-6">
+              About <span className="text-gradient">Adventurers</span>
+            </h1>
+            <p className="text-text-muted text-lg max-w-2xl mx-auto">
+              We are on a mission to redefine exploration and create meaningful connections between people and the world's most incredible places.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {aboutSections.map((section, index) => {
+              const Icon = icons[index % icons.length];
+              return (
+                <motion.div
+                  key={section.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group p-8 md:p-12 rounded-[2.5rem] bg-white/5 border border-white/10 hover:border-primary-accent/30 transition-all hover:bg-white/[0.07] shadow-2xl backdrop-blur-sm"
                 >
-                  <Typography
-                    variant="h5"
-                    gutterBottom
-                    sx={{
-                      color: 'var(--secondary-color)',
-                      fontWeight: 700,
-                      mb: 3,
-                      fontFamily: 'Montserrat, Poppins, sans-serif',
-                    }}
-                  >
+                  <div className="w-16 h-16 bg-primary-accent/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                    <Icon className="w-8 h-8 text-primary-accent" />
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 group-hover:text-primary-accent transition-colors">
                     {section.title}
-                  </Typography>
-                  <Typography paragraph sx={{ color: 'var(--text-light)' }}>
+                  </h2>
+                  <p className="text-text-muted text-lg leading-relaxed">
                     {section.content}
-                  </Typography>
-                </Box>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    </Container>
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Team / Vision Section Placeholder */}
+      <section className="py-24 bg-white/5 border-y border-white/5 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+              "Travel is the only thing you buy <br />
+              <span className="text-secondary-accent">that makes you richer.</span>"
+            </h2>
+            <div className="w-20 h-1 bg-primary-accent mx-auto rounded-full" />
+          </motion.div>
+        </div>
+      </section>
+    </div>
   );
 };
 
-export default About; 
+export default About;

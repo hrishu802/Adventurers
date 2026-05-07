@@ -1,30 +1,36 @@
-import { AppBar, Toolbar, Typography, Box, IconButton, useTheme, useMediaQuery } from '@mui/material';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
-import MenuIcon from '@mui/icons-material/Menu';
-import { useState, useEffect } from 'react';
-import Button from './Button';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Compass, User, LogOut, ChevronDown } from 'lucide-react';
+import { cn } from '../utils/cn';
 import { NavService } from '../services/NavService';
-import { useNavigate } from 'react-router-dom';
 import { userService } from '../services/UserService';
 
 const navService = new NavService();
 
 const Navbar: React.FC = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  
   const location = useLocation();
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const checkAuth = () => {
       const userId = localStorage.getItem('userId');
       setIsLoggedIn(!!userId);
     };
-    
     checkAuth();
-    // Listen for storage changes (e.g. from other tabs)
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
   }, [location]);
@@ -33,107 +39,185 @@ const Navbar: React.FC = () => {
     userService.logout();
     setIsLoggedIn(false);
     navigate('/login');
+    setIsProfileOpen(false);
   };
 
   const navItems = navService.getPrimaryItems().filter(item => 
     item.name !== 'Profile' || isLoggedIn
   );
-  const authItems = navService.getAuthItems();
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: 'secondary.main', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-      <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
-        <Typography
-          variant="h5"
-          component={RouterLink}
-          className="navbar-brand"
-          to="/"
-          sx={{
-            textDecoration: 'none',
-            color: '#fff !important',
-            fontFamily: 'Poppins, sans-serif',
-            fontWeight: 700,
-            letterSpacing: 1,
-            fontSize: { xs: '1.5rem', md: '1.8rem' },
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-          }}
-        >
-          {/* Logo icon representation */}
-          <span style={{ fontSize: 28, display: 'flex', alignItems: 'center' }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+    <nav
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4',
+        isScrolled ? 'bg-background/80 backdrop-blur-lg py-3 shadow-lg border-b border-white/5' : 'bg-transparent'
+      )}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo */}
+        <RouterLink to="/" className="flex items-center gap-2 group">
+          <div className="w-10 h-10 bg-primary-accent rounded-xl flex items-center justify-center shadow-lg shadow-primary-accent/20 group-hover:scale-110 transition-transform">
+            <Compass className="text-background w-6 h-6" />
+          </div>
+          <span className="text-2xl font-bold font-poppins tracking-tight text-white">
+            Adventurers
           </span>
-          Token of Memento
-        </Typography>
+        </RouterLink>
 
-        {isMobile ? (
-          <IconButton color="inherit" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            <MenuIcon />
-          </IconButton>
-        ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            {navItems.map((item) => (
-              <Typography
-                key={item.path}
-                component={RouterLink}
-                to={item.path}
-                sx={{
-                  color: '#fff',
-                  textDecoration: 'none',
-                  position: 'relative',
-                  fontWeight: location.pathname === item.path ? 600 : 400,
-                  transition: 'all 0.3s ease',
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    width: location.pathname === item.path ? '100%' : '0%',
-                    height: '2px',
-                    bottom: -4,
-                    left: 0,
-                    bgcolor: 'accent.main',
-                    transition: 'all 0.3s ease',
-                  },
-                  '&:hover::after': {
-                    width: '100%',
-                  }
-                }}
-              >
-                {item.name}
-              </Typography>
-            ))}
-            <Box ml={2} display="flex" gap={2}>
-              {!isLoggedIn ? (
-                authItems.map((item) => (
-                  item.name === 'Sign Up' ? (
-                    <Button key={item.path} variant="accent" component={RouterLink} to={item.path}>
-                      {item.name}
-                    </Button>
-                  ) : (
-                    <Typography
-                      key={item.path}
-                      component={RouterLink}
-                      to={item.path}
-                      sx={{ color: '#fff', textDecoration: 'none', fontWeight: 500, alignSelf: 'center', transition: '0.3s', '&:hover': { color: 'accent.main' } }}
-                    >
-                      {item.name}
-                    </Typography>
-                  )
-                ))
-              ) : (
-                <Button variant="outlined" sx={{ color: '#fff', borderColor: '#fff', '&:hover': { borderColor: 'accent.main', color: 'accent.main' } }} onClick={handleLogout}>
-                  Logout
-                </Button>
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          {navItems.map((item) => (
+            <RouterLink
+              key={item.path}
+              to={item.path}
+              className={cn(
+                'text-sm font-medium transition-colors hover:text-primary-accent relative group',
+                location.pathname === item.path ? 'text-primary-accent' : 'text-text-muted'
               )}
-            </Box>
-          </Box>
+            >
+              {item.name}
+              <span className={cn(
+                'absolute -bottom-1 left-0 h-0.5 bg-primary-accent transition-all duration-300',
+                location.pathname === item.path ? 'w-full' : 'w-0 group-hover:w-full'
+              )} />
+            </RouterLink>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="hidden md:flex items-center gap-4">
+          {!isLoggedIn ? (
+            <>
+              <RouterLink 
+                to="/login" 
+                className="text-sm font-medium text-text-muted hover:text-white transition-colors"
+              >
+                Login
+              </RouterLink>
+              <RouterLink
+                to="/signup"
+                className="px-5 py-2.5 bg-primary-accent text-background font-semibold rounded-2xl hover:bg-primary-accent/90 transition-all shadow-lg shadow-primary-accent/20 hover:scale-105 active:scale-95"
+              >
+                Join Now
+              </RouterLink>
+            </>
+          ) : (
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-2 p-1.5 pr-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors border border-white/10"
+              >
+                <div className="w-8 h-8 bg-secondary-accent rounded-xl flex items-center justify-center">
+                  <User className="w-5 h-5 text-background" />
+                </div>
+                <ChevronDown className={cn('w-4 h-4 text-text-muted transition-transform', isProfileOpen && 'rotate-180')} />
+              </button>
+
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-2 w-48 bg-background/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2 overflow-hidden"
+                  >
+                    <RouterLink
+                      to="/profile"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-white/5 rounded-xl transition-colors text-sm text-text-muted hover:text-white"
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </RouterLink>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-3 hover:bg-red-500/10 rounded-xl transition-colors text-sm text-red-400"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden p-2 text-white"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden mt-4 bg-background/95 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+          >
+            <div className="p-6 flex flex-col gap-4">
+              {navItems.map((item) => (
+                <RouterLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    'text-lg font-medium transition-colors',
+                    location.pathname === item.path ? 'text-primary-accent' : 'text-text-muted'
+                  )}
+                >
+                  {item.name}
+                </RouterLink>
+              ))}
+              <hr className="border-white/10" />
+              {!isLoggedIn ? (
+                <div className="flex flex-col gap-3">
+                  <RouterLink
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-center py-3 text-text-muted font-medium"
+                  >
+                    Login
+                  </RouterLink>
+                  <RouterLink
+                    to="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-center py-3 bg-primary-accent text-background font-bold rounded-2xl"
+                  >
+                    Join Now
+                  </RouterLink>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <RouterLink
+                    to="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-2 py-3 text-text-muted"
+                  >
+                    <User className="w-5 h-5" />
+                    Profile
+                  </RouterLink>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 py-3 text-red-400"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
         )}
-      </Toolbar>
-    </AppBar>
+      </AnimatePresence>
+    </nav>
   );
 };
 
-export default Navbar; 
+export default Navbar;
