@@ -102,7 +102,7 @@ export const destinationRecords: Destination[] = [
     title: 'Broadway Show',
     price: 189,
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800',
+    image: 'https://images.openai.com/static-rsc-4/-JNrGmWDswPD_ghTltRW3YXLt18tJtvkHBk6nYWJ1yWE0spfvugsTYxnnErbhYX-4aL-wnxW17egnAEajZ9rGkcoW5DMWyxVjfND4JIXk8a_HcnwUSk1Hcuqse6G8Sw7pm7WFkp6WQnXQWQIipwo6rTOnbC0KIsIJDAzwQjX9rqgoJMH9081KyEWgXh8MhVr?purpose=fullsize',
     description: 'Experience world-class theater with premium seating and a guided city walk.',
     duration: '3 Hours'
   },
@@ -113,7 +113,7 @@ export const destinationRecords: Destination[] = [
     title: 'NYC Explorer',
     price: 1499,
     rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1534430480872-3498386e7a55?auto=format&fit=crop&w=800',
+    image: 'https://images.openai.com/static-rsc-4/-JNrGmWDswPD_ghTltRW3YXLt18tJtvkHBk6nYWJ1yWE0spfvugsTYxnnErbhYX-4aL-wnxW17egnAEajZ9rGkcoW5DMWyxVjfND4JIXk8a_HcnwUSk1Hcuqse6G8Sw7pm7WFkp6WQnXQWQIipwo6rTOnbC0KIsIJDAzwQjX9rqgoJMH9081KyEWgXh8MhVr?purpose=fullsize',
     description: 'A full New York itinerary with landmark visits, dining, and sightseeing tours.',
     duration: '6 Days'
   },
